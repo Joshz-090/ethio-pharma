@@ -1,0 +1,35 @@
+# Python
+backend/venv/
+backend/__pycache__/
+backend/*.py[cod]
+backend/*$py.class
+backend/.env
+backend/db.sqlite3
+backend/static/
+backend/media/
+
+# Flutter (pos_app)
+pos_app/.dart_tool/
+pos_app/.idea/
+pos_app/.vscode/
+pos_app/build/
+pos_app/.metadata
+pos_app/.packages
+pos_app/pubspec.lock
+pos_app/*.iml
+pos_app/windows/flutter/ephemeral/
+
+# Web (web_portal)
+web_portal/node_modules/
+web_portal/.next/
+web_portal/out/
+web_portal/build/
+web_portal/.env*
+web_portal/*.log
+
+# General
+.DS_Store
+*.swp
+*.bak
+.idea/
+.vscode/
