@@ -1,9 +1,11 @@
+import uuid
 from django.db import models
 from pharmacies.models import Pharmacy
 from pharmacies.managers import PharmacyManager
 
 class GlobalMedicine(models.Model):
     """Global Registry: A synchronized catalog of approved medicines in Ethiopia."""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     generic_name = models.CharField(max_length=255)
     scientific_name = models.CharField(max_length=255, null=True, blank=True)
     category = models.CharField(max_length=100, null=True, blank=True) # 'Antibiotic', etc.
@@ -24,6 +26,7 @@ class GlobalMedicine(models.Model):
 
 class Inventory(models.Model):
     """Pharmacy Specific Inventory (Tenant Isolated)"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     pharmacy = models.ForeignKey(Pharmacy, on_delete=models.CASCADE, related_name='inventory_items')
     medicine = models.ForeignKey(GlobalMedicine, on_delete=models.CASCADE, related_name='stock_at_pharmacies')
     

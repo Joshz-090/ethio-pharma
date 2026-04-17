@@ -68,7 +68,13 @@ npm run dev
 
 ---
 
+## 🔑 Key Technical Decisions
+- **UUID Primary Keys**: All models use `UUID v4` for IDs to ensure data portability, secure public URLs, and easy merging if we ever move to a distributed/offline-first local DB sync for rural pharmacies.
+- **Logical Multi-Tenancy**: We use a `pharmacy` ForeignKey on all tenant-specific models. Data isolation is strictly enforced via a custom `PharmacyManager`.
+- **Global Medicine Catalog**: A shared registry of medicines ensures data consistency across the ecosystem, while each pharmacy maintains its own `Inventory` linked to this registry.
+
 ## 📜 Development Rules
-1. **Isolation**: Never query models without filtering by `pharmacy`.
-2. **Atomic**: All sales must be wrapped in `transaction.atomic`.
-3. **Commits**: Use clear messages (e.g., `feat(sales): added VAT calculation`).
+1. **Isolation**: Never query tenant models without using `PharmacyManager` or filtering by `pharmacy`.
+2. **Atomic Items**: All sales transactions must be wrapped in `transaction.atomic` (handled by `SalesService`).
+3. **Precision**: Use `DecimalField` for all currency and VAT calculations to avoid floating-point errors.
+4. **Commits**: Follow conventional commits (e.g., `feat(sales): added VAT calculation`).

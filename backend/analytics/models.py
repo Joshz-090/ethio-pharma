@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from pharmacies.models import Pharmacy
 from inventory.models import GlobalMedicine
@@ -5,6 +6,7 @@ from pharmacies.managers import PharmacyManager
 
 class DailyPharmacyInsights(models.Model):
     """Analytics Data Pipe for AI insights"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     pharmacy = models.ForeignKey(Pharmacy, on_delete=models.CASCADE, related_name='insights')
     date = models.DateField()
     

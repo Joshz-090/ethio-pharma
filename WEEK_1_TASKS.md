@@ -4,29 +4,42 @@
 
 ---
 
-### Day 1: Multi-Tenancy Engine & Middleware
-- **Focus**: Logical isolation.
+### ✅ Day 1: Multi-Tenancy Engine & Middleware (Core Ready)
+- **Status**: Core logic (Manager/UUIDs) done. Middleware next.
 - **Tasks**:
-  1. Create a custom Django Manager `PharmacyManager` that automatically filters by `pharmacy_id`.
-  2. Implement a `TenantMiddleware` that extracts `pharmacy_id` from the JWT or Header.
-  3. Update `inventory` and `sales` models to use the `PharmacyManager`.
+  1. [DONE] Create custom `PharmacyManager` for logical isolation.
+  2. [PENDING] Implement `TenantMiddleware` to extract `pharmacy_id` from JWT.
+  3. [DONE] Update `inventory` and `sales` models to use the `PharmacyManager` and `UUID` Primary Keys.
 - **Outcome**: `Medicine.objects.all()` only returns medicines for the active pharmacy.
 
 ### Day 2: Advanced Account & Auth Setup
 - **Focus**: Role-based access.
 - **Tasks**:
-  1. Refine `User` model roles: `SuperAdmin`, `PharmacyOwner`, `Cashier`.
-  2. Setup `RegisterPharmacy` endpoint (Automates creation of Pharmacy + Admin User).
-  3. Implement Login with JWT that includes the `pharmacy_id` in the payload.
+  1. [TODO] Refine `User` model roles in `accounts/models.py`: `SuperAdmin`, `PharmacyOwner`, `Cashier`.
+  2. [TODO] Setup `RegisterPharmacy` endpoint (Automates creation of Pharmacy + Admin User).
+  3. [TODO] Implement Login with JWT that includes the `pharmacy_id` in the payload.
 - **Outcome**: Secure, multi-tenant authentication.
 
-### Day 3: Global Catalog vs. Local Stock
-- **Focus**: Data structure.
+### ✅ Day 3: Global Catalog vs. Local Stock (Models Mapped)
+- **Status**: Models align with `SCHEMA_DESIGN.sql`. Linkage logic next.
 - **Tasks**:
-  1. Separate `GlobalMedicine` (Generic name, scientific name) from `Inventory` (Batch, Expiry, Price).
-  2. Create a "linkage" system so pharmacies can "Add" a medicine from the global catalog to their local stock.
-  3. Basic CRUD endpoints for Pharmacy Inventory.
-- **Outcome**: Controlled inventory management.
+  1. [DONE] Separate `GlobalMedicine` (Generic) from `Inventory` (Specific Stock).
+  2. [TODO] Create a "linkage" system in `InventoryService` so pharmacies can "Add" a medicine from the global catalog.
+  3. [TODO] CRUD endpoints for Pharmacy Inventory in `InventoryViewSet`.
+- **Outcome**: Controlled inventory management following the two-tier registry pattern.
+
+---
+
+### ⚠️ IMPORTANT: Database Reset Required
+Since we have switched all Primary Keys to **UUID v4** to match the team's production SQL standard, existing migrations must be reset.
+1. Clear your local DB or Supabase project.
+2. Run `python manage.py makemigrations`.
+3. Run `python manage.py migrate`.
+
+---
+
+### Day 4: The Public Search API
+... (rest of the file remains similar) ...
 
 ### Day 4: The Public Search API
 - **Focus**: Web portal backend.

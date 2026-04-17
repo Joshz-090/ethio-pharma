@@ -1,6 +1,8 @@
+import uuid
 from django.db import models
 
 class Pharmacy(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     license_number = models.CharField(max_length=100, unique=True, null=True, blank=True)
     address = models.TextField(null=True, blank=True)
@@ -12,11 +14,6 @@ class Pharmacy(models.Model):
     
     subscription_plan = models.CharField(max_length=50, default='free') # 'free', 'pro', 'enterprise'
     is_active = models.BooleanField(default=True)
-    
-    # Legacy fields (keep for now or migrate)
-    owner_name = models.CharField(max_length=255, blank=True)
-    owner_phone = models.CharField(max_length=20, blank=True)
-    
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

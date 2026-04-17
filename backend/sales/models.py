@@ -1,9 +1,11 @@
+import uuid
 from django.db import models
 from pharmacies.models import Pharmacy
 from inventory.models import Inventory
 from pharmacies.managers import PharmacyManager
 
 class Sale(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     pharmacy = models.ForeignKey(Pharmacy, on_delete=models.CASCADE, related_name='sales')
     total_amount = models.DecimalField(max_digits=12, decimal_places=2)
     vat_amount = models.DecimalField(max_digits=12, decimal_places=2) # 15% VAT compliance
@@ -26,6 +28,7 @@ class Sale(models.Model):
         ]
 
 class SaleItem(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sale = models.ForeignKey(Sale, on_delete=models.CASCADE, related_name='items')
     inventory_item = models.ForeignKey(Inventory, on_delete=models.PROTECT, related_name='sold_items')
     

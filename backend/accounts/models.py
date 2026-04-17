@@ -1,8 +1,10 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from pharmacies.models import Pharmacy
 
 class User(AbstractUser):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     pharmacy = models.ForeignKey(
         Pharmacy, 
         on_delete=models.CASCADE, 
