@@ -8,7 +8,6 @@ class Sale(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     pharmacy = models.ForeignKey(Pharmacy, on_delete=models.CASCADE, related_name='sales')
     total_amount = models.DecimalField(max_digits=12, decimal_places=2)
-    vat_amount = models.DecimalField(max_digits=12, decimal_places=2) # 15% VAT compliance
     discount_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     
     payment_method = models.CharField(max_length=50, default='Cash') # 'Cash', 'CBE Birr', 'Telebirr'

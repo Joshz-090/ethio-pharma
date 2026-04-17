@@ -1,42 +1,51 @@
-from rest_framework import viewsets, permissions, serializers
-from rest_framework.decorators import action
+from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from .models import GlobalMedicine, Inventory
 from .serializers import GlobalMedicineSerializer, InventorySerializer
 from .services.inventory_service import InventoryService
+from .selectors import inventory_selectors
+from common.utils import api_response
 
 class GlobalMedicineViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    Publicly searchable global medicine catalog.
+    Public ViewSet for searching the Global Registry.
     """
-    queryset = GlobalMedicine.objects.all()
     serializer_class = GlobalMedicineSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
-    @action(detail=False, methods=['get'])
-    def search(self, request):
-        query = request.query_params.get('q', '')
-        if len(query) < 2:
-            return Response([])
-        
-        medicines = GlobalMedicine.objects.filter(
-            generic_name__icontains=query
-        )[:10]
-        
-        serializer = self.get_serializer(medicines, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        query = self.request.query_params.get('q', '')
+        return inventory_selectors.global_medicine_search_selector(query)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return api_response(success=True, data=serializer.data)
 
 class InventoryViewSet(viewsets.ModelViewSet):
     """
-    Pharmacy-specific inventory management.
+    Verified ViewSet for Pharmacy-specific stock.
+    Enforces strict logical isolation.
     """
     serializer_class = InventorySerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # We manually filter here to be safe and explicit, 
-        # but PharmacyManager 'objects' also helps.
-        return Inventory.objects.filter(pharmacy=self.request.user.pharmacy)
+        # Strict isolation via Selector
+        return inventory_selectors.inventory_list_selector(self.request.user.pharmacy)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return api_response(success=True, data=serializer.data)
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            instance = inventory_selectors.inventory_get_selector(request.user.pharmacy, kwargs.get('pk'))
+            serializer = self.get_serializer(instance)
+            return api_response(success=True, data=serializer.data)
+        except Inventory.DoesNotExist:
+            return api_response(success=False, error="Inventory item not found", status=status.HTTP_404_NOT_FOUND)
 
     def perform_create(self, serializer):
         InventoryService().create_inventory(

@@ -13,9 +13,9 @@ This is the heart of the Ethio-Pharma ecosystem. It is a **multi-tenant Django R
 - `accounts/`: Custom user models supporting roles (Admin, Owner, Cashier) and pharmacy linkage.
 - `pharmacies/`: The tenant core. Manages pharmacy profiles, licenses, and subscriptions.
 - `inventory/`: 
-    - `GlobalMedicine`: Shared Registry for verified medicines.
-    - `Inventory`: Tenant-specific stock records (Batch, Expiry, Price).
-- `sales/`: Atomic transaction engine for POS sales and VAT (15%) compliance.
+    - `GlobalMedicine`: Shared Registry for verified medicines (EFDA synced).
+    - `Inventory`: Tenant-specific stock records.
+- `sales/`: Atomic transaction engine for high-speed POS sales.
 - `analytics/`: Data aggregation for AI stock prediction and daily business insights.
 - `core/`: Project configuration, URL routing, and security settings.
 
@@ -29,10 +29,12 @@ This is the heart of the Ethio-Pharma ecosystem. It is a **multi-tenant Django R
    ```bash
    pip install -r requirements.txt
    ```
-3. **Database Migration**:
+3. **Database Reset & Sync**:
    ```bash
+   python reset_db.py           # Required for UUID Migration (Development only)
    python manage.py makemigrations
    python manage.py migrate
+   python inventory/scripts/import_efda.py # Import EFDA catalog
    ```
 4. **Run Server**:
    ```bash

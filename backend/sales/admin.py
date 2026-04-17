@@ -8,7 +8,7 @@ class SaleItemInline(admin.TabularInline):
 
 @admin.register(Sale)
 class SaleAdmin(admin.ModelAdmin):
-    list_display = ('id', 'pharmacy', 'total_amount', 'vat_amount', 'payment_method', 'created_at')
+    list_display = ('id', 'pharmacy', 'total_amount', 'payment_method', 'created_at')
     list_filter = ('pharmacy', 'created_at', 'payment_method')
     inlines = [SaleItemInline]
     search_fields = ('id', 'cashier_name')

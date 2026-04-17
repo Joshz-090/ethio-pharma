@@ -10,6 +10,8 @@ CREATE TABLE pharmacies (
     location_lat DECIMAL(9,6),
     location_lon DECIMAL(9,6),
     subscription_plan VARCHAR(50) DEFAULT 'free', -- 'free', 'pro', 'enterprise'
+    subscription_expiry DATE,
+    status VARCHAR(20) DEFAULT 'pending', -- 'pending', 'approved', 'rejected', 'suspended'
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -46,7 +48,6 @@ CREATE TABLE sales (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     pharmacy_id UUID REFERENCES pharmacies(id),
     total_amount DECIMAL(12,2) NOT NULL,
-    vat_amount DECIMAL(12,2) NOT NULL, -- 15% VAT compliance
     discount_amount DECIMAL(12,2) DEFAULT 0,
     payment_method VARCHAR(50), -- 'Cash', 'CBE Birr', 'Telebirr'
     cashier_name VARCHAR(255),

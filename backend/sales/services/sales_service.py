@@ -24,13 +24,11 @@ class SalesService:
             raise ValidationError("No items provided for the sale.")
 
         total_amount = Decimal('0.00')
-        vat_rate = Decimal('0.15') # 15% Standard Ethiopian VAT
 
         # Initial Sale record
         sale = Sale.objects.create(
             pharmacy=pharmacy,
             total_amount=0,
-            vat_amount=0,
             payment_method=payment_method,
             cashier_name=cashier_name
         )
@@ -78,15 +76,13 @@ class SalesService:
                 "subtotal": float(line_total)
             })
 
-        # Update final amounts (Assuming price is VAT inclusive for Ethiopian retail)
+        # Update final amounts
         sale.total_amount = total_amount
-        sale.vat_amount = (total_amount * vat_rate / (Decimal('1.0') + vat_rate)).quantize(Decimal('0.01'))
         sale.save()
 
         return {
             "sale_id": sale.id,
             "total_amount": float(sale.total_amount),
-            "vat_amount": float(sale.vat_amount),
             "items": receipt_items,
             "status": "success"
         }

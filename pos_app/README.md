@@ -4,8 +4,8 @@
 A cross-platform **Flutter** application designed for high-performance pharmacy operations. Primary targets are **Windows Desktop** (for cashiers) and **Android** (for mobile inventory management).
 
 ### ✨ Key Features
-- **High-Speed POS**: Atomic cart-based sales with auto-calculated VAT.
-- **Offline Reliability**: SQLite-based local caching for medicine search.
+- **High-Speed POS**: Atomic cart-based sales with direct stock deduction.
+- **Offline-First**: Sales transactions are stored locally on the PC and synchronized to the cloud when internet is available.
 - **Modern UI**: Dark/Light mode support with a focus on accessibility and speed.
 - **Reporting**: Daily sales summaries and low-stock visual alerts.
 
