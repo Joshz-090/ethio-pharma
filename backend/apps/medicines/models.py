@@ -20,5 +20,9 @@ class Inventory(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.IntegerField(default=0)
     
+    @property
+    def is_low_stock(self):
+        return self.quantity < 10
+    
     def __str__(self):
         return f"{self.medicine.name} at {self.pharmacy.name}"

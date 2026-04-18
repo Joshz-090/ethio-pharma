@@ -17,7 +17,8 @@ class Reservation(models.Model):
     expires_at = models.DateTimeField()
     
     STATUS_CHOICES = [
-        ('pending', 'Pending'),
+        ('pending', 'Pending Approval'),
+        ('active', 'Active (Ready for Pickup)'),
         ('fulfilled', 'Fulfilled'),
         ('expired', 'Expired'),
         ('cancelled', 'Cancelled')
