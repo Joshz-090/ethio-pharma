@@ -26,12 +26,15 @@ class IsPharmacist(permissions.BasePermission):
 
 class IsAdminUser(permissions.BasePermission):
     """
-    Allows access only to users with 'admin' role.
+    Allows access only to users with 'admin' role OR Django superusers.
     """
     def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
+        # Allow Django superadmins (manage.py createsuperuser)
+        if request.user.is_staff or request.user.is_superuser:
+            return True
         return bool(
-            request.user and 
-            request.user.is_authenticated and 
             hasattr(request.user, 'profile') and 
             request.user.profile.role == 'admin'
         )

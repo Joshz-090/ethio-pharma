@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'reservations',
     'prescriptions',
     'analytics',
+    'sales',
     'core',
 ]
 

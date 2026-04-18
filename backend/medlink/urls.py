@@ -17,6 +17,7 @@ from pharmacies.views import PharmacyViewSet
 from medicines.views import MedicineViewSet, InventoryViewSet
 from reservations.views import ReservationViewSet
 from prescriptions.views import PrescriptionViewSet
+from sales.views import SaleViewSet
 
 router.register(r'auth', AuthViewSet, basename='auth')
 router.register(r'pharmacies', PharmacyViewSet, basename='pharmacy')
@@ -25,6 +26,7 @@ router.register(r'medicines', MedicineViewSet, basename='medicine')
 router.register(r'inventory', InventoryViewSet, basename='inventory')
 router.register(r'reservations', ReservationViewSet, basename='reservation')
 router.register(r'prescriptions', PrescriptionViewSet, basename='prescription')
+router.register(r'sales', SaleViewSet, basename='sale')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
