@@ -15,10 +15,13 @@ class MedicineViewSet(viewsets.ModelViewSet):
 class InventoryViewSet(viewsets.ModelViewSet):
     serializer_class = InventorySerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['medicine__name', 'medicine__category', 'pharmacy__name']
+    ordering_fields = ['price', 'pharmacy__name']
 
     def get_queryset(self):
         user = self.request.user
-        qs = Inventory.objects.all()
+        qs = Inventory.objects.all().select_related('medicine', 'pharmacy')
         
         # Admin can see all inventory
         if hasattr(user, 'profile') and user.profile.role == 'admin':
@@ -30,6 +33,5 @@ class InventoryViewSet(viewsets.ModelViewSet):
                 return qs.filter(pharmacy=user.profile.pharmacy)
             return qs.none()
             
-        # Patients see all inventory from active/approved pharmacies
-        # Implement logic for location sorting if needed
-        return qs.filter(pharmacy__is_active=True, quantity__gt=0)
+        # Patients: only see stock from approved pharmacies
+        return qs.filter(pharmacy__is_active=True, pharmacy__status='approved', quantity__gt=0)

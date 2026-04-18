@@ -12,12 +12,13 @@ from rest_framework_simplejwt.views import (
 router = DefaultRouter()
 
 # Registering ViewSets
+from users.views import UserProfileViewSet, AuthViewSet
 from pharmacies.views import PharmacyViewSet
-from users.views import UserProfileViewSet
 from medicines.views import MedicineViewSet, InventoryViewSet
 from reservations.views import ReservationViewSet
 from prescriptions.views import PrescriptionViewSet
 
+router.register(r'auth', AuthViewSet, basename='auth')
 router.register(r'pharmacies', PharmacyViewSet, basename='pharmacy')
 router.register(r'users/profiles', UserProfileViewSet, basename='user-profile')
 router.register(r'medicines', MedicineViewSet, basename='medicine')
