@@ -6,10 +6,10 @@ import django
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 # Setup Django environment
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'medlink.settings')
 django.setup()
 
-from inventory.models import GlobalMedicine
+from medicines.models import Medicine
 
 def import_efda_data():
     """
@@ -18,35 +18,31 @@ def import_efda_data():
     """
     initial_catalog = [
         {
-            "generic_name": "Amoxicillin",
-            "scientific_name": "Amoxicillinum",
+            "name": "Amoxicillin",
             "category": "Antibacterial",
-            "dosage_form": "Capsule",
-            "strength": "500mg"
+            "description": "Used to treat various bacterial infections.",
+            "requires_prescription": True
         },
         {
-            "generic_name": "Paracetamol",
-            "scientific_name": "Paracetamolum",
+            "name": "Paracetamol",
             "category": "Analgesic",
-            "dosage_form": "Tablet",
-            "strength": "500mg"
+            "description": "Pain reliever and fever reducer.",
+            "requires_prescription": False
         },
         {
-            "generic_name": "Metformin",
-            "scientific_name": "Metforminum",
+            "name": "Metformin",
             "category": "Antidiabetic",
-            "dosage_form": "Tablet",
-            "strength": "850mg"
+            "description": "Controls blood sugar levels in type 2 diabetes.",
+            "requires_prescription": True
         },
     ]
 
     for item in initial_catalog:
-        GlobalMedicine.objects.update_or_create(
-            generic_name=item['generic_name'],
-            strength=item['strength'],
+        Medicine.objects.update_or_create(
+            name=item['name'],
             defaults=item
         )
-        print(f"Imported/Updated: {item['generic_name']}")
+        print(f"Imported/Updated: {item['name']}")
 
 if __name__ == "__main__":
     import_efda_data()
