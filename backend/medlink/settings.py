@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'medicines',
     'reservations',
     'prescriptions',
+    'analytics',
     'core',
 ]
 
