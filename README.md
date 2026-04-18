@@ -30,6 +30,15 @@
 
 ---
 
+## 👥 Team Roadmap (Assignees)
+To ensure we move in parallel, each member has a dedicated task guide:
+*   [🛠️ **Eyasu** (Backend)](./backend/EYASU_TASKS.md)
+*   [📱 **Yadesa** (Mobile Application)](./pos_app/YADESA_TASKS.md)
+*   [🌐 **Misiker** (Web Frontend)](./frontend/MISIKER_TASKS.md)
+*   [🧠 **Hanan** (Docs & AI Strategy)](./docs/HANAN_TASKS.md)
+
+---
+
 ## ✨ Why MedLink?
 - **Localized**: Tailored for Sikela, Secha, and other Arba Minch sectors.
 - **Secure**: JWT role-based authentication and prescription verification.
