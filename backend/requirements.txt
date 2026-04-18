@@ -1,8 +1,9 @@
 django>=4.2,<5.0
 djangorestframework
-psycopg2-binary
-python-dotenv
-djangorestframework-simplejwt
 django-cors-headers
-django-filter
-drf-spectacular
+django-dotenv
+python-dotenv
+psycopg2-binary
+djangorestframework-simplejwt
+gunicorn
+whitenoise

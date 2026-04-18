@@ -1,38 +1,23 @@
-# 💻 Ethio-Pharma POS (Desktop & Mobile)
+# Smart Med Tracker: Pharmacy POS (pos_app)
 
-### Overview
-A cross-platform **Flutter** application designed for high-performance pharmacy operations. Primary targets are **Windows Desktop** (for cashiers) and **Android** (for mobile inventory management).
+## 🖥️ Role
+The `pos_app` is the primary interface for **Pharmacists** in Arba Minch. It is a cross-platform (Windows & Android) application designed for high-speed inventory operations and reservation fulfillment.
 
-### ✨ Key Features
-- **High-Speed POS**: Atomic cart-based sales with direct stock deduction.
-- **Offline-First**: Sales transactions are stored locally on the PC and synchronized to the cloud when internet is available.
-- **Modern UI**: Dark/Light mode support with a focus on accessibility and speed.
-- **Reporting**: Daily sales summaries and low-stock visual alerts.
+## 🚀 Key Responsibilities
+- **Stock Management**: Fast stock intake using the Global Medicine Catalog.
+- **Reservation Processing**: Viewing and fulfilling user reservations made via the web portal.
+- **Expiry Monitoring**: Visual alerts for medicines approaching expiration.
+- **Offline Sync**: Caching inventory data locally to ensure the pharmacy can operate during internet outages.
 
-### 📂 Directory Structure
-- `lib/core/`: 
-    - `api/`: Dio-based networking with interceptors for JWT/Pharmacy-ID.
-    - `theme/`: Professional pharmaceutical color palette.
-- `lib/features/`:
-    - `auth/`: Multi-tenant login and role discovery.
-    - `pos/`: The cashier workspace (Cart, Search, Receipt Generation).
-    - `inventory/`: Stock browsing and scanning.
-- `lib/models/`: Clean architecture data models mirroring the Global/Local registry.
-- `assets/`: Optimized brand assets and iconography.
+## 🏗️ Flutter Architecture
+- **Lib/Api**: Dio-based client calling the Django backend.
+- **Lib/Providers**: Riverpod-based state management for inventory and search.
+- **Lib/Screens**: 
+    - `InventoryScreen`: CRUD for local stock.
+    - `ReservationScreen`: List of active Holds for users.
+    - `SearchScreen`: Quick lookup of global medicine registry.
 
-### 🚀 Getting Started
-1. **Fetch Dependencies**:
-   ```bash
-   flutter pub get
-   ```
-2. **Environment Setup**:
-   Copy `.env.example` to `.env` and set your `API_BASE_URL`.
-3. **Run Application**:
-   ```bash
-   flutter run -d windows # For desktop
-   ```
-
-### 📋 Technical Standards
-- **State Management**: Provider / Riverpod.
-- **Local DB**: `sqflite` for caching.
-- **Design Pattern**: Feature-driven clean architecture.
+## ⏱️ 1-Week Goals
+- [ ] Connect to the new `inventory` and `reservations` API endpoints.
+- [ ] Implement the "Reserved" list view.
+- [ ] Add "Expiry Date" sorting and highlights.
