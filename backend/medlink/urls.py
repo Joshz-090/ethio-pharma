@@ -11,9 +11,19 @@ from rest_framework_simplejwt.views import (
 # Initialize DRF Router
 router = DefaultRouter()
 
-# We will register our viewsets here later
-# router.register(r'pharmacies', PharmacyViewSet, basename='pharmacy')
-# ...
+# Registering ViewSets
+from pharmacies.views import PharmacyViewSet
+from users.views import UserProfileViewSet
+from medicines.views import MedicineViewSet, InventoryViewSet
+from reservations.views import ReservationViewSet
+from prescriptions.views import PrescriptionViewSet
+
+router.register(r'pharmacies', PharmacyViewSet, basename='pharmacy')
+router.register(r'users/profiles', UserProfileViewSet, basename='user-profile')
+router.register(r'medicines', MedicineViewSet, basename='medicine')
+router.register(r'inventory', InventoryViewSet, basename='inventory')
+router.register(r'reservations', ReservationViewSet, basename='reservation')
+router.register(r'prescriptions', PrescriptionViewSet, basename='prescription')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
