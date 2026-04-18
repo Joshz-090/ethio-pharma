@@ -1,19 +1,29 @@
-# 🧠 Hanan: AI & Documentation (Day 2 Tasks)
+# 🧠 Hanan: AI & Documentation Technical Tasks
 
-### 🎯 Objective: Intelligence & Clarity
-Make the system "smart" and ensure the documentation is investor-ready.
+## 📅 Day 1: Architecture & API Documentation (DONE)
+1.  **Architecture Diagram**:
+    *   Use `draw.io` or `Mermaid` to create a diagram showing: Patient (Mobile) → API (Render) → Supabase DB.
+    *   Include all 5 apps: `users`, `pharmacies`, `medicines`, `reservations`, `prescriptions`.
+2.  **API Endpoint Reference**:
+    *   Document every live endpoint in `docs/api_design.md`.
+    *   For each endpoint include: Method, URL, Headers needed, Body format, and Example JSON Response.
+    *   Focus on: `POST /api/auth/register/`, `GET /api/inventory/`, `POST /api/reservations/`, `POST /api/prescriptions/`.
+3.  **Team Setup Guide**:
+    *   Write `docs/setup_guide.md` with step-by-step instructions for each team member to clone the repo and get started.
 
-### 📅 Tomorrow's Sprint (Day 2):
-1.  **[ ] AI Prescription OCR**:
-    *   Integrate a simple Python/Tesseract or API-based system to "Read" prescriptions.
-    *   (Stretch goal): Auto-match extracted text with the `Medicine` catalog.
-2.  **[ ] Demand Predictor**:
-    *   Create a simple algorithm (or mock data service) that suggests which drugs to buy more of based on search trends.
-3.  **[ ] Full API Documentation**:
-    *   Document the new `/api/reservations/` and `/api/auth/register/` endpoints with code examples.
-4.  **[ ] Team Coordination**:
-    *   Verify today's progress with all team members and update the Master Roadmap.
-5.  **[ ] Pitch Preparation**:
-    *   Draft 5 slides explaining the problem Arba Minch faces and how MedLink solves it.
-
-### ⚠️ Deadline: AI Demo must be ready for integration by Day 3 morning.
+## 📅 Day 2: AI Features & Pitch (TOMORROW)
+1.  **Prescription OCR**:
+    *   In `docs/ai/ocr_service.py`, use the `pytesseract` library to extract text from a medicine prescription image.
+    *   Run: `pip install pytesseract pillow`.
+    *   Write a function `def extract_medicine_names(image_path: str) -> list[str]` that reads the image and returns a list of potential medicine names.
+    *   Test it against a sample prescription scan and log the output.
+2.  **Demand Predictor**:
+    *   In `docs/ai/demand_predictor.py`, write a function that takes medicine names as input and queries the backend API.
+    *   Return a list like: `[{"medicine": "Amoxicillin", "weekly_searches": 45, "restock_urgency": "HIGH"}]`.
+3.  **Pitch Deck Slides**:
+    *   Create a Google Slides or PowerPoint file with exactly **5 slides**:
+        *   Slide 1: The Problem (People in Arba Minch can't find medicine fast).
+        *   Slide 2: The Solution (MedLink: Search, Reserve, Pickup).
+        *   Slide 3: The Technology (Show the architecture diagram).
+        *   Slide 4: The Team (Eyasu, Yadesa, Misiker, Hanan - with roles).
+        *   Slide 5: Live Demo QR Code linking to `https://ethio-pharma.onrender.com/api/`.

@@ -1,21 +1,28 @@
-# 💻 Misiker: Frontend Developer (Day 2 Tasks)
+# 💻 Misiker: Frontend Developer Technical Tasks
 
-### 🎯 Objective: The Professional Dashboard
-The backend is LIVE! Use `NEXT_PUBLIC_API_URL=https://ethio-pharma.onrender.com/api`.
+## 📅 Day 1: Project Setup & Auth (DONE)
+1.  **Project Setup**:
+    *   Initialize Next.js: `npx create-next-app@latest frontend --typescript`.
+    *   Create `.env.local` and add `NEXT_PUBLIC_API_URL=https://ethio-pharma.onrender.com/api`.
+2.  **Auth Flow**:
+    *   Install `axios`: `npm install axios`.
+    *   Build `pages/login.tsx` with a form that sends `POST /api/token/` and saves the returned `access` token in `localStorage`.
+    *   Create `middleware.ts` that redirects unauthenticated users away from dashboard pages.
+3.  **Dashboard Layout**:
+    *   Create a sidebar layout component with navigation links: Dashboard, Inventory, Orders, Prescriptions.
+    *   Build `pages/dashboard/inventory.tsx` that fetches `GET /api/inventory/` (with Authorization header) and renders results in a table.
 
-### 📅 Tomorrow's Sprint (Day 2):
-1.  **[ ] Order Verification Dashboard**:
-    *   Build a real-time list of "Pending Reservations" coming into the pharmacy.
-    *   Add "Approve" and "Collect" buttons for the pharmacist.
-2.  **[ ] Dynamic Inventory Management**:
-    *   Table view for Current Stock.
-    *   Forms to "Add Medicine" and "Update Price" using the new backend services.
-3.  **[ ] Prescription Reviewer**:
-    *   A view for pharmacists to see uploaded prescription images and approve them.
-4.  **[ ] Analytics Charts**:
-    *   Integrate `chart.js` or `recharts`.
-    *   Show a "Sales vs Date" graph for the pharmacist's daily overview.
-5.  **[ ] Responsive Design**:
-    *   Ensure the dashboard looks perfect on Tablets and Laptops used in pharmacies.
-
-### ⚠️ Deadline: Pharmacist "Day in the Life" flow must work by Tomorrow night.
+## 📅 Day 2: Order Management & Analytics (TOMORROW)
+1.  **Live Order Queue**:
+    *   Create `pages/dashboard/orders.tsx` that fetches `GET /api/reservations/` filtered by status `pending`.
+    *   For each order, show two buttons: **"Mark as Fulfilled"** (`PATCH /api/reservations/{id}/` with `status: "fulfilled"`) and **"Cancel"**.
+    *   Use `setInterval` every 30 seconds to auto-refresh the order list.
+2.  **Inventory Management Forms**:
+    *   Build an "Add Stock" modal form that sends `POST /api/inventory/` with `medicine`, `pharmacy`, `quantity`, and `price`.
+    *   Build an inline "Edit" button per row that sends `PATCH /api/inventory/{id}/` to update price or quantity.
+3.  **Prescription Review Panel**:
+    *   Create `pages/dashboard/prescriptions.tsx` that fetches `GET /api/prescriptions/`.
+    *   Display the uploaded prescription image and an **"Approve"** button that sends `PATCH /api/prescriptions/{id}/` with `status: "approved"`.
+4.  **Analytics Chart**:
+    *   Install `recharts`: `npm install recharts`.
+    *   Fetch `GET /api/analytics/daily-sales/` and plot a `LineChart` showing total sales per day this week.
