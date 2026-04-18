@@ -27,7 +27,8 @@ def get_env_variable(var_name, default=None, required=True):
 
 # 2. CORE SETTINGS
 # ===============
-SECRET_KEY = get_env_variable('SECRET_KEY')
+# Provide a dummy key for build time if missing
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-build-time-dummy-key')
 
 # Debug parsing
 debug_val = os.getenv('DEBUG', 'False').lower()
