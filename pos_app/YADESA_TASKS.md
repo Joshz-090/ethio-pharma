@@ -1,29 +1,21 @@
-# 📱 Mobile Application Plan: Yadesa
+# 📱 Yadesa: Mobile Developer (Day 2 Tasks)
 
-Yadesa, your goal is to transform the "POS App" skeleton into the **MedLink Patient Application**. This app is exclusively for normal users in Arba Minch.
+### 🎯 Objective: The Perfect Patient Experience
+The backend is LIVE! Connect your Flutter app to `https://ethio-pharma.onrender.com/api`.
 
-## 🚀 Setup Instructions
-1. `cd pos_app`
-2. `flutter pub get`
-3. Rename the project in `pubspec.yaml` to `medlink_patient`.
-4. `flutter run`
+### 📅 Tomorrow's Sprint (Day 2):
+1.  **[ ] Global Search & Maps**:
+    *   Show a list of medicines from the API.
+    *   Integrate Google Maps (or flutter_map) to show the pharmacy location.
+2.  **[ ] Reservation Life-cycle**:
+    *   Build the "Reserve" button that sends a `POST` to `/api/reservations/`.
+    *   Show a countdown timer (60 mins) on the customer's screen.
+3.  **[ ] Prescription Upload**:
+    *   Implement image picking from the gallery/camera.
+    *   Upload to `/api/prescriptions/` and handle the success state.
+4.  **[ ] Reservation History**:
+    *   A screen showing the user's past and active reservations.
+5.  **[ ] QR Code Generation**:
+    *   Generate a unique QR code for each reservation for the pharmacist to scan.
 
-## 🎯 Your Coding Tasks for Today
-1.  **Rebranding**: Update the app name, colors, and logo to "MedLink Arba Minch".
-2.  **Medicine Search UI**: Create a clean, beautiful search bar and list for medicines. Each item should show:
-    *   Medicine Name
-    *   Pharmacy Name
-    *   Price
-    *   Distance (Location)
-3.  **Reservation Flow**:
-    *   Add a "Reserve for 60 mins" button.
-    *   Create a simple confirmation screen.
-4.  **Auth Integration**: Use the `JWT` login flow to authenticate Patients.
-
-## 📄 Key Files to Work On
-- `lib/api/` (Update base URL to point to Eyasu's local IP or the Render URL).
-- `lib/screens/medicine_search.dart` (You need to create this).
-- `lib/screens/reservations.dart` (You need to create this).
-
-## 📡 Deliverable
-A working APK that can log in and display a list of medicines fetched from the Backend.
+### ⚠️ Deadline: UI flows must be 100% functional by Tomorrow night.

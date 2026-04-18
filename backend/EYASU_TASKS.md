@@ -1,29 +1,21 @@
-# 🛠️ Backend Development Plan: Eyasu
+# 🛡️ Eyasu: Backend Lead (Day 2 Tasks)
 
-Eyasu, the core infrastructure is now ready with Django + Supabase (PostgreSQL). Your job is to finish the internal logic (Services) so the apps can talk.
+### 🎯 Objective: High-Performance Engine
+We have the basics live. Today, you must build the "Senior" features that make MedLink professional.
 
-## 🚀 Setup Instructions
-1. `cd backend`
-2. `python -m venv venv`
-3. `venv\Scripts\activate`
-4. `pip install -r requirements.txt`
-5. Create `.env` based on `.env.example` (Get Supabase credentials from your team).
-6. `python manage.py migrate`
-7. `python manage.py runserver`
+### 📅 Tomorrow's Sprint (Day 2):
+1.  **[ ] Inventory Watchdog**:
+    *   Build an endpoint `GET /api/inventory/low-stock/` that specifically flags items below `threshold`.
+    *   Implement an email/notification trigger when stock hits zero.
+2.  **[ ] Prescription Management**:
+    *   Finish the `PATCH /api/prescriptions/{id}/approve/` endpoint.
+    *   Hook it up so that when a pharmacist approves, a reservation can be finalized.
+3.  **[ ] Sales & Analytics**:
+    *   Create a `Sales` model to track actual completions.
+    *   Build `GET /api/analytics/daily/` to give pharmacists their total sales for today.
+4.  **[ ] Multi-Tenant Hardening**:
+    *   Double-check that a pharmacist from "Pharmacy A" cannot see reservations for "Pharmacy B."
+5.  **[ ] API for AI Integration**:
+    *   Support Hanan by creating an endpoint that accepts OCR text results and searches for medicines.
 
-## 🎯 Your Coding Tasks for Today
-You MUST follow the **Service-Selector Pattern**:
-*   **Users & Auth**: Implement `services.py` in the `users` app to handle user registration vs pharmacist association. 
-*   **Reservations (COMPLEX)**: Implement the logic in `reservations/services.py` so that when a patient reserves a medicine:
-    *   It checks if stock > quantity.
-    *   It creates the reservation and sets an expiry in 60 minutes.
-    *   It *decrements* the stock count temporarily.
-*   **Prescriptions**: Ensure the `prescriptions/views.py` allows image URL uploads.
-
-## 📄 Key Files to Work On
-- `apps/reservations/services.py`
-- `apps/medicines/services/inventory_service.py`
-- `apps/users/views.py` (Finish the Profile registration logic)
-
-## 📡 Deliverable
-Confirm that `GET /api/inventory/` and `POST /api/reservations/` work on your local machine using Postman.
+### ⚠️ Deadline: MUST be pushed to Main by 6:00 PM Tomorrow.

@@ -1,27 +1,21 @@
-# 🌐 Web Application Plan: Misiker
+# 💻 Misiker: Frontend Developer (Day 2 Tasks)
 
-Misiker, you are building the **MedLink Pharmacy & Admin Portal** using Next.js. This is where Pharmacists manage their business and Admins monitor the system.
+### 🎯 Objective: The Professional Dashboard
+The backend is LIVE! Use `NEXT_PUBLIC_API_URL=https://ethio-pharma.onrender.com/api`.
 
-## 🚀 Setup Instructions
-1. `cd frontend`
-2. Run `npx create-next-app@latest ./ --typescript --tailwind --eslint`. (Use these options when asked).
-3. `npm install axios framer-motion lucide-react`
-4. `npm run dev`
+### 📅 Tomorrow's Sprint (Day 2):
+1.  **[ ] Order Verification Dashboard**:
+    *   Build a real-time list of "Pending Reservations" coming into the pharmacy.
+    *   Add "Approve" and "Collect" buttons for the pharmacist.
+2.  **[ ] Dynamic Inventory Management**:
+    *   Table view for Current Stock.
+    *   Forms to "Add Medicine" and "Update Price" using the new backend services.
+3.  **[ ] Prescription Reviewer**:
+    *   A view for pharmacists to see uploaded prescription images and approve them.
+4.  **[ ] Analytics Charts**:
+    *   Integrate `chart.js` or `recharts`.
+    *   Show a "Sales vs Date" graph for the pharmacist's daily overview.
+5.  **[ ] Responsive Design**:
+    *   Ensure the dashboard looks perfect on Tablets and Laptops used in pharmacies.
 
-## 🎯 Your Coding Tasks for Today
-1.  **Dashboard Shell**: Build a professional side-navigation layout (using Lucide icons).
-2.  **Inventory Management Page**:
-    *   Table view of the pharmacy's stock.
-    *   "Update Quantity" and "Change Price" buttons.
-3.  **Prescription Approval Flow**:
-    *   A list of pending prescriptions uploaded by patients.
-    *   Functionality to view the image and click "Approve" (Status: Approved) or "Reject" (Status: Rejected).
-
-## 📄 Components to Build
-- `/components/DashboardLayout.tsx`
-- `/app/inventory/page.tsx`
-- `/app/prescriptions/page.tsx`
-- `/services/api.ts` (Point to Eyasu's backend).
-
-## 📡 Deliverable
-A functional web portal shell where a pharmacist can log in and see their specific inventory table.
+### ⚠️ Deadline: Pharmacist "Day in the Life" flow must work by Tomorrow night.
