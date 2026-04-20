@@ -11,12 +11,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Insert apps directory into sys.path to allow 'users', 'pharmacies' etc. imports
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
-# Load .env file from the project root
+# Load .env file from the project root (for local development)
 ENV_PATH = BASE_DIR / '.env'
 if ENV_PATH.exists():
     load_dotenv(ENV_PATH)
+    print("Loaded .env file from project root")
 else:
-    print(f"CRITICAL ERROR: .env file not found at {ENV_PATH}")
+    print("INFO: .env file not found, using environment variables (production mode)")
 
 def get_env_variable(var_name, default=None, required=True):
     """Safely load and validate environment variables."""
@@ -34,7 +35,16 @@ debug_val = os.getenv('DEBUG', 'False').lower()
 DEBUG = debug_val in ('true', '1', 't')
 print(f"SYSTEM INFO: DEBUG mode is set to {DEBUG}")
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+# Handle ALLOWED_HOSTS for both development and production
+allowed_hosts_env = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1')
+if 'onrender.com' in allowed_hosts_env:
+    ALLOWED_HOSTS = allowed_hosts_env.split(',')
+else:
+    # Add Render domain to allowed hosts in production
+    if not DEBUG:
+        ALLOWED_HOSTS = ['ethio-pharma.onrender.com'] + allowed_hosts_env.split(',')
+    else:
+        ALLOWED_HOSTS = allowed_hosts_env.split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
