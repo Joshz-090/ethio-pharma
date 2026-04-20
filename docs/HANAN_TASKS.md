@@ -27,3 +27,9 @@
         *   Slide 3: The Technology (Show the architecture diagram).
         *   Slide 4: The Team (Eyasu, Yadesa, Misiker, Hanan - with roles).
         *   Slide 5: Live Demo QR Code linking to `https://ethio-pharma.onrender.com/api/`.
+
+    ### Day 2 Implementation Status
+    - `docs/ai/ocr_service.py`: Implemented with `extract_medicine_names(image_path: str) -> list[str]`
+    - `docs/ai/demand_predictor.py`: Implemented demand prediction helper
+    - `docs/ai/README.md`: Added install + run instructions for both AI prototypes
+    - `docs/pitch_deck_outline.md`: Added 5-slide ready outline for judges

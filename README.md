@@ -1,46 +1,71 @@
-# MedLink: Arba Minch 🕊️
+# MedLink: Arba Minch
 
-## 📍 Project Overview
-**MedLink** is a comprehensive pharmaceutical ecosystem designed specifically for the Arba Minch community. It optimizes medicine discovery, simplifies pharmacy inventory, and ensures patient safety through prescription verification.
+## Project Overview
+MedLink is a pharmaceutical ecosystem built for the Arba Minch community. It helps patients find medicines, reserve stock, and upload prescriptions while giving pharmacists and admins the tools to manage inventory, approvals, and analytics.
 
----
+## MVP Goals
+- Working medicine search and reservation flow for patients
+- Clear role separation: patient, pharmacist, admin
+- Reliable backend APIs for mobile and web
+- Strong documentation for judges and onboarding
 
-## 📁 Repository Structure
+## System Architecture
 
-### ⚙️ /backend (Django REST API)
-- **`/medlink`**: Project configuration and security settings.
-- **`/apps`**: Domain-specific logic (Users, Pharmacies, Medicines, Reservations, Prescriptions).
-- **`/core`**: Shared logic, base models, and custom permissions.
+```mermaid
+flowchart LR
+		A[Patient - Flutter Mobile] -->|Search, reserve, upload RX| B[Django REST API]
+		C[Pharmacist/Admin - Web Portal] -->|Manage stock, approve RX, view analytics| B
+		B --> D[(PostgreSQL - Local or Supabase)]
 
-### 🌐 /frontend (Next.js)
-- Dedicated web portal exclusively for **Pharmacies and Admins** to manage inventory, approve prescriptions, and view analytics.
+		subgraph Backend Apps
+			U[users]
+			P[pharmacies]
+			M[medicines]
+			R[reservations]
+			X[prescriptions]
+			S[sales]
+			N[analytics]
+		end
 
-### 📱 /mobile (Flutter)
-- Dedicated Android application exclusively for **Normal Users (Patients)** to search for medicines, make reservations, and upload prescriptions.
+		B --> U
+		B --> P
+		B --> M
+		B --> R
+		B --> X
+		B --> S
+		B --> N
+```
 
-### 📄 /docs (Detailed Documentation)
-- Problem statement, detailed architecture, API design, and setup guides.
+## Repository Structure
 
----
+### backend/
+- medlink/: project settings, urls, wsgi/asgi
+- apps/: domain modules (users, pharmacies, medicines, reservations, prescriptions, sales, analytics)
+- core/: shared permissions and common logic
 
-## 🚀 Quick Start
-1.  **Backend**: `python manage.py runserver` (See `/docs/setup_guide.md`)
-2.  **Mobile**: `flutter run`
-3.  **Frontend**: `npm run dev`
+### frontend/
+- Intended Next.js web portal for pharmacists and admins
+- Note: Next.js scaffold is currently missing and should be initialized
 
----
+### pos_app/
+- Flutter app for patient and pharmacy point-of-service workflows
 
-## 👥 Team Roadmap (Assignees)
-To ensure we move in parallel, each member has a dedicated task guide:
-*   [🛠️ **Eyasu** (Backend)](./backend/EYASU_TASKS.md)
-*   [📱 **Yadesa** (Mobile Application)](./pos_app/YADESA_TASKS.md)
-*   [🌐 **Misiker** (Web Frontend)](./frontend/MISIKER_TASKS.md)
-*   [🧠 **Hanan** (Docs & AI Strategy)](./docs/HANAN_TASKS.md)
+### docs/
+- API references, setup guide, architecture, and Hanan task deliverables
 
----
+## Quick Start
+1. Backend setup and run: see [docs/setup_guide.md](docs/setup_guide.md)
+2. API reference and test payloads: see [docs/api_design.md](docs/api_design.md)
+3. Hanan AI/documentation tasks: see [docs/HANAN_TASKS.md](docs/HANAN_TASKS.md)
 
-## ✨ Why MedLink?
-- **Localized**: Tailored for Sikela, Secha, and other Arba Minch sectors.
-- **Secure**: JWT role-based authentication and prescription verification.
-- **Smart**: Track medicine popularity and demand heatmaps in real-time.
-- **Robust Docs**: Comprehensive guides to win judges' hearts. 💥
+## Team Task Guides
+- [backend/EYASU_TASKS.md](backend/EYASU_TASKS.md)
+- [pos_app/YADESA_TASKS.md](pos_app/YADESA_TASKS.md)
+- [frontend/MISIKER_TASKS.md](frontend/MISIKER_TASKS.md)
+- [docs/HANAN_TASKS.md](docs/HANAN_TASKS.md)
+
+## Why MedLink
+- Localized for real pharmacy discovery in Arba Minch
+- JWT-based authentication with role-aware access paths
+- Reservation and prescription workflows designed for practical use
+- Documentation-first approach for strong hackathon presentation
