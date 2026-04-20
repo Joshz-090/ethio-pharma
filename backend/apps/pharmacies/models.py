@@ -8,10 +8,6 @@ class Pharmacy(models.Model):
     address = models.TextField(null=True, blank=True)
     phone_number = models.CharField(max_length=20, null=True, blank=True)
     
-    # Location for patient search
-    location_lat = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    location_lon = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    
     subscription_plan = models.CharField(max_length=50, default='free') # 'free', 'pro', 'enterprise'
     subscription_expiry = models.DateField(null=True, blank=True)
     
@@ -31,3 +27,20 @@ class Pharmacy(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.license_number})"
+
+class PharmacyLocation(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    pharmacy = models.OneToOneField(Pharmacy, on_delete=models.CASCADE, related_name='location')
+    
+    latitude = models.DecimalField(max_digits=9, decimal_places=6)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6)
+    
+    SECTOR_CHOICES = [
+        ('Sikela', 'Sikela'),
+        ('Secha', 'Secha'),
+        ('Other', 'Other'),
+    ]
+    sector = models.CharField(max_length=50, choices=SECTOR_CHOICES, default='Sikela')
+    
+    def __str__(self):
+        return f"Location for {self.pharmacy.name} ({self.sector})"

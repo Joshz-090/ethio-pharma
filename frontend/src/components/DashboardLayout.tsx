@@ -1,5 +1,5 @@
 'use client';
-import { useState, ReactNode } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -77,12 +77,20 @@ function NavItem({ label, href, icon: Icon, isActive, collapsed }: NavItemProps)
 interface DashboardLayoutProps { children: ReactNode }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
+  const [mounted, setMounted] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const sidebarW = collapsed ? 72 : 260;
+  
+  // Prevent hydration mismatch by only rendering time-specific info on client
   const now = new Date();
-  const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-  const dateStr = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  const timeStr = mounted ? now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '--:--';
+  const dateStr = mounted ? now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : '...';
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--color-bg-base)' }}>
