@@ -1,15 +1,6 @@
-# 🧠 Hanan: AI & Documentation Technical Tasks
+# 🧠 Docs & AI Intelligence Plan: Hanan
 
-## 📅 Day 1: Architecture & API Documentation (DONE)
-1.  **Architecture Diagram**:
-    *   Use `draw.io` or `Mermaid` to create a diagram showing: Patient (Mobile) → API (Render) → Supabase DB.
-    *   Include all 5 apps: `users`, `pharmacies`, `medicines`, `reservations`, `prescriptions`.
-2.  **API Endpoint Reference**:
-    *   Document every live endpoint in `docs/api_design.md`.
-    *   For each endpoint include: Method, URL, Headers needed, Body format, and Example JSON Response.
-    *   Focus on: `POST /api/auth/register/`, `GET /api/inventory/`, `POST /api/reservations/`, `POST /api/prescriptions/`.
-3.  **Team Setup Guide**:
-    *   Write `docs/setup_guide.md` with step-by-step instructions for each team member to clone the repo and get started.
+Hanan, your role is the most strategic. You need to make the system "Smart" and ensure our documentation is winning-quality for the project judges.
 
 ## 📅 Day 2: AI Features & Pitch (TOMORROW)
 1.  **Prescription OCR**:
