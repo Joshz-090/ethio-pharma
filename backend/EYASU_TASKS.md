@@ -1,29 +1,33 @@
-# 🛠️ Backend Development Plan: Eyasu
+# 🦁 Eyasu's Backend Roadmap — Final Phase
 
-Eyasu, the core infrastructure is now ready with Django + Supabase (PostgreSQL). Your job is to finish the internal logic (Services) so the apps can talk.
+This document tracks the final technical requirements for the Ethio-Pharma Production Backend.
 
-## 🚀 Setup Instructions
-1. `cd backend`
-2. `python -m venv venv`
-3. `venv\Scripts\activate`
-4. `pip install -r requirements.txt`
-5. Create `.env` based on `.env.example` (Get Supabase credentials from your team).
-6. `python manage.py migrate`
-7. `python manage.py runserver`
+## ✅ Completed Tasks (The Foundation)
+- [x] **Architecture**: Implemented Service-Selector pattern across all apps.
+- [x] **Inventory**: Atomic stock management with `select_for_update()`.
+- [x] **Reservations**: 60-min holding logic with restorative cancellation.
+- [x] **Localization**: Sector-based search for Sikela/Secha (Arba Minch).
+- [x] **Security**: Full RBAC (Pharmacist, Patient, Admin roles).
+- [x] **Docs**: Automated OpenAPI 3.0 schema and Swagger UI (`/api/docs/`).
 
-## 🎯 Your Coding Tasks for Today
-You MUST follow the **Service-Selector Pattern**:
-*   **Users & Auth**: Implement `services.py` in the `users` app to handle user registration vs pharmacist association. 
-*   **Reservations (COMPLEX)**: Implement the logic in `reservations/services.py` so that when a patient reserves a medicine:
-    *   It checks if stock > quantity.
-    *   It creates the reservation and sets an expiry in 60 minutes.
-    *   It *decrements* the stock count temporarily.
-*   **Prescriptions**: Ensure the `prescriptions/views.py` allows image URL uploads.
+## 🚀 Priority 1: Advanced Business Logic (Immediate Next)
+- [ ] **AI Insights API**: Build a prediction endpoint `GET /api/analytics/predict/` to calculate demand based on historic search fails.
+- [ ] **Notification Engine**: Integration with SMS gateway (AfricasTalking/Twilio) for reservation confirmation.
+- [ ] **Rate Limiting**: Implementation of DRF Throttling to prevent inventory spam.
 
-## 📄 Key Files to Work On
-- `apps/reservations/services.py`
-- `apps/medicines/services/inventory_service.py`
-- `apps/users/views.py` (Finish the Profile registration logic)
+## 🧠 Priority 2: AI & Pipeline Integration
+- [ ] **OCR Prescriptions**: Data pipeline to handle uploaded images and extract medicine metadata.
+- [ ] **Admin Global Dashboard**: Aggregate cross-pharmacy revenue and stock alerts for the SaaS owner.
+- [ ] **Cache Layer**: Redis integration for high-traffic medicine searches.
 
-## 📡 Deliverable
-Confirm that `GET /api/inventory/` and `POST /api/reservations/` work on your local machine using Postman.
+## ☁️ Priority 3: Deployment & DevOps
+- [ ] **Static Assets**: Configure WhiteNoise or S3 for production asset serving.
+- [ ] **Database Optimization**: Connection pooling (already started via Supabase/pgBouncer).
+- [ ] **CI/CD**: Setup GitHub Actions for automated testing and deployment.
+
+---
+
+### 📝 Notes for Integration:
+- **Frontend (Misiker)**: Point the portal to the new reservation fulfillment endpoints.
+- **AI (Hanan)**: The `SearchHistory` model is now live; start pulling data for the demand predictor.
+- **Mobile (Eyasu/Team)**: Ensure the JWT Auth endpoint is using the production-ready `users` model.

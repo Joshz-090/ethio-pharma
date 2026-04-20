@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+    'drf_spectacular',
 
     # Local apps (Domain Logic)
     'users',
@@ -55,8 +56,18 @@ INSTALLED_APPS = [
     'medicines',
     'reservations',
     'prescriptions',
+    'analytics',
+    'reminders',
+    'ai_integration',
     'core',
 ]
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Ethio-Pharma MedLink API',
+    'DESCRIPTION': 'Localized Pharmacy SaaS for Arba Minch sectors (Sikela/Secha)',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -117,6 +128,14 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Ethio-Pharma MedLink API',
+    'DESCRIPTION': 'Inventory management and reservation system for Arba Minch pharmacies.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
 }
 
 SIMPLE_JWT = {
@@ -137,7 +156,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # CORS for React Admin Portal
 CORS_ALLOW_ALL_ORIGINS = DEBUG
-CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(',') if not DEBUG else []
+cors_env = os.getenv('CORS_ALLOWED_ORIGINS', '')
+CORS_ALLOWED_ORIGINS = [o.strip() for o in cors_env.split(',') if o.strip()] if not DEBUG else []
 
 # 5. STATIC & MEDIA
 # =================

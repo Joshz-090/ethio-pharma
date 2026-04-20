@@ -8,20 +8,29 @@ Misiker, you are building the **MedLink Pharmacy & Admin Portal** using Next.js.
 3. `npm install axios framer-motion lucide-react`
 4. `npm run dev`
 
-## 🎯 Your Coding Tasks for Today
-1.  **Dashboard Shell**: Build a professional side-navigation layout (using Lucide icons).
-2.  **Inventory Management Page**:
-    *   Table view of the pharmacy's stock.
-    *   "Update Quantity" and "Change Price" buttons.
-3.  **Prescription Approval Flow**:
-    *   A list of pending prescriptions uploaded by patients.
-    *   Functionality to view the image and click "Approve" (Status: Approved) or "Reject" (Status: Rejected).
+## ✅ Day 1-2 Progress Audit
+- [x] Project environment initialized (Next.js + Tailwind).
+- [x] Dashboard Shell & Sidebar navigation created.
+- [x] API client service (`/services/api.ts`) skeleton built.
+- [x] Basic UI components for Stock Tables designed.
 
-## 📄 Components to Build
-- `/components/DashboardLayout.tsx`
-- `/app/inventory/page.tsx`
-- `/app/prescriptions/page.tsx`
-- `/services/api.ts` (Point to Eyasu's backend).
+## 🎯 Day 3: Search Engine & API Binding (TODAY)
+Today we go live. The portal must talk to Eyasu's backend and look beautiful.
 
-## 📡 Deliverable
-A functional web portal shell where a pharmacist can log in and see their specific inventory table.
+1.  **Public Search Engine**:
+    *   Build `/app/search/page.tsx`.
+    *   Implement a "Sector Toggle" (Sikela/Secha/All).
+    *   Display results as cards: `[Medicine Name] - [Price] - [Pharmacy Location]`.
+2.  **Reservation Flow**:
+    *   A "Reserve Now" button on each medicine card.
+    *   Show a countdown timer for the 1-hour hold.
+3.  **Real API Integration**:
+    *   Switch from mock data to real Axios calls in `/services/api.ts`.
+    *   Handle loading states with nice spinners (use Framer Motion).
+4.  **Responsive Polish**:
+    *   Ensure the site looks "Native" on mobile browsers (judges will check on their phones).
+
+## 📄 Final Deliverables
+- [ ] Working "Search by Location" feature.
+- [ ] End-to-end Reservation flow (Patient POV).
+- [ ] Pharmacist Dashboard showing real-time inventory updates.
