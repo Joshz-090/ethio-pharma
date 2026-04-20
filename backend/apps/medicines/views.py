@@ -41,12 +41,19 @@ class InventoryViewSet(viewsets.ModelViewSet):
         """
         query = request.query_params.get('q', '')
         sector = request.query_params.get('sector', 'All')
+        lat = request.query_params.get('lat')
+        long = request.query_params.get('long')
         
         # Log for AI analytics
         log_search(query=query, sector=sector)
         
-        # Execute localized search logic
-        results = search_medicines_by_sector(query=query, sector=sector)
+        # Execute localized search logic with GPS sorting
+        results = search_medicines_by_sector(
+            query=query, 
+            sector=sector,
+            user_lat=lat,
+            user_long=long
+        )
         
         serializer = self.get_serializer(results, many=True)
         return Response(serializer.data)
