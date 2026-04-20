@@ -15,7 +15,7 @@ class MedicineSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Medicine
-        fields = ['id', 'name', 'category', 'description', 'usage_instructions', 'requires_prescription', 'reviews', 'average_rating']
+        fields = ['id', 'name', 'category', 'description', 'requires_prescription', 'reviews', 'average_rating']
 
     def get_average_rating(self, obj):
         reviews = obj.reviews.all()
@@ -29,4 +29,4 @@ class InventorySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Inventory
-        fields = '__all__'
+        fields = ['id', 'pharmacy', 'medicine', 'price', 'quantity', 'usage_instructions']

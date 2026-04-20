@@ -76,9 +76,10 @@ To make the home screen look alive, use the Trending endpoint.
 ## 💬 Step 7: Social Feedback & Usage Details
 Enable trust between patients through reviews and clear instructions.
 
-### A. Usage Instructions
-- **Data**: In the `Medicine` object, use the `usage_instructions` field (e.g., "Take after dinner").
-- **UI**: Display this clearly on the Medicine Detail screen.
+### A. Pharmacy-Specific Instructions (Optional)
+- **Data**: In the `Inventory` object (Stock), use the `usage_instructions` field.
+- **Provider**: This is added by the pharmacist only. If it's empty, just don't show the section in the UI.
+- **UI**: Display this on the "Stock details" or when a user clicks a specific pharmacy's result.
 
 ### B. Reviews & Ratings
 - **Get Reviews**: Included in the `Medicine` object under the `reviews` list.

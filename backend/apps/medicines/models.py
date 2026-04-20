@@ -8,7 +8,6 @@ class Medicine(models.Model):
     name = models.CharField(max_length=255)
     category = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    usage_instructions = models.TextField(null=True, blank=True) # e.g. "Take after meal, twice a day"
     requires_prescription = models.BooleanField(default=False)
     
     def __str__(self):
@@ -20,6 +19,7 @@ class Inventory(models.Model):
     medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE, related_name='inventories')
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.IntegerField(default=0)
+    usage_instructions = models.TextField(null=True, blank=True) # Added here (Pharmacy specific)
     
     def __str__(self):
         return f"{self.medicine.name} at {self.pharmacy.name}"
