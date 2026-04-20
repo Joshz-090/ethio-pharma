@@ -18,11 +18,18 @@ This guide provides the technical roadmap for connecting the Next.js web applica
 
 ---
 
-## 🔐 Step 1: Authentication & Role Management
-- **Endpoint**: `POST /token/` 
-- **User Role Logic**: 
-  - Admin: Access to Pharmacy Approval & Global Analytics.
-  - Pharmacist: Access to Inventory, Sales, & AI Verification.
+## 🔐 Step 1: User Registration
+Misiker, there are two ways to enter the system:
+
+### A. New Pharmacist Registration
+1.  **Create User**: Use `POST /api/users/register/` with `role: "pharmacist"`.
+2.  **Submit Pharmacy**: Once logged in, use `POST /api/pharmacies/`.
+    - **Logic**: The backend will mark this as `status: "pending"`.
+    - **Linking**: The system will automatically link this pharmacy to the user's profile.
+
+### B. Admin Entry
+- Global Admins are created via the Django Admin panel or by another Admin.
+- Admins see the **"Registration Hall"**—a list of all pharmacies with `status: "pending"`.
 
 ---
 

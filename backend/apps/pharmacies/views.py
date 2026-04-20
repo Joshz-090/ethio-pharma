@@ -7,18 +7,22 @@ class PharmacyViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Admins or patients can see all active pharmacies
-        # Note: We can implement logic so patients only see active pharmacies
         user = self.request.user
-        
         if hasattr(user, 'profile') and user.profile.role == 'admin':
             return Pharmacy.objects.all()
-            
         if hasattr(user, 'profile') and user.profile.role == 'pharmacist':
-            # Pharmacists can only see their own pharmacy
             if user.profile.pharmacy:
                 return Pharmacy.objects.filter(id=user.profile.pharmacy.id)
             return Pharmacy.objects.none()
-            
-        # Patients
         return Pharmacy.objects.filter(is_active=True, status='approved')
+
+    def perform_create(self, serializer):
+        # Create the pharmacy with pending status
+        pharmacy = serializer.save(status='pending', is_active=True)
+        
+        # Automatically link this pharmacy to the Pharmacist's profile
+        user = self.request.user
+        if hasattr(user, 'profile') and user.profile.role == 'pharmacist':
+            profile = user.profile
+            profile.pharmacy = pharmacy
+            profile.save()
