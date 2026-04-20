@@ -73,6 +73,20 @@ To make the home screen look alive, use the Trending endpoint.
 - **UI Tip**: Show "Trending in Arba Minch" at the top and "Your Recent History" below it.
 
 ---
+## 💬 Step 7: Social Feedback & Usage Details
+Enable trust between patients through reviews and clear instructions.
+
+### A. Usage Instructions
+- **Data**: In the `Medicine` object, use the `usage_instructions` field (e.g., "Take after dinner").
+- **UI**: Display this clearly on the Medicine Detail screen.
+
+### B. Reviews & Ratings
+- **Get Reviews**: Included in the `Medicine` object under the `reviews` list.
+- **Add Review**: `POST /medicines/reviews/`
+  - Payload: `{"medicine": "UUID", "rating": 5, "comment": "Excellent service!"}`
+- **Like a Review**: `POST /medicines/reviews/<ID>/like/`
+
+---
 
 ### 💡 Pro-Tips for Yadesa:
 1.  **Error Handling**: If a reservation fails because stock is gone, the backend will return a `400 Bad Request`. Show a message: "Sorry, someone just took the last box!"

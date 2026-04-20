@@ -1,8 +1,8 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import Medicine, Inventory
-from .serializers import MedicineSerializer, InventorySerializer
+from .models import Medicine, Inventory, Review
+from .serializers import MedicineSerializer, InventorySerializer, ReviewSerializer
 from .selectors import search_medicines_by_sector
 from analytics.services import log_search
 from core.common.permissions import IsAdmin, IsPharmacist, IsPatient
@@ -11,6 +11,24 @@ class MedicineViewSet(viewsets.ModelViewSet):
     queryset = Medicine.objects.all()
     serializer_class = MedicineSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for Medicine Reviews.
+    """
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    @action(detail=True, methods=['post'])
+    def like(self, request, pk=None):
+        review = self.get_object()
+        review.likes += 1
+        review.save()
+        return Response({'status': 'liked', 'total_likes': review.likes})
 
 class InventoryViewSet(viewsets.ModelViewSet):
     serializer_class = InventorySerializer
