@@ -25,9 +25,12 @@ router.register(r'inventory', InventoryViewSet, basename='inventory')
 router.register(r'reservations', ReservationViewSet, basename='reservation')
 router.register(r'prescriptions', PrescriptionViewSet, basename='prescription')
 
+from users.views import RegisterView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('api/users/register/', RegisterView.as_view(), name='auth_register'),
     path('api-auth/', include('rest_framework.urls')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

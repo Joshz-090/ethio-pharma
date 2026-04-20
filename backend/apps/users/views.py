@@ -1,6 +1,11 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, generics
 from .models import User, UserProfile
-from .serializers import UserProfileSerializer
+from .serializers import UserProfileSerializer, RegisterSerializer
+
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = RegisterSerializer
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     """

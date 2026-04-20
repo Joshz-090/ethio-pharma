@@ -1,10 +1,18 @@
 from rest_framework import viewsets, permissions
 from .models import Pharmacy
 from .serializers import PharmacySerializer
-
 class PharmacyViewSet(viewsets.ModelViewSet):
     serializer_class = PharmacySerializer
     permission_classes = [permissions.IsAuthenticated]
+    def perform_create(self, serializer):
+        # Save the pharmacy and mark status as pending
+        pharmacy = serializer.save(status='pending')
+        
+        # Link the pharmacy to the authenticated user's profile
+        user = self.request.user
+        if hasattr(user, 'profile'):
+            user.profile.pharmacy = pharmacy
+            user.profile.save()
 
     def get_queryset(self):
         # Admins or patients can see all active pharmacies

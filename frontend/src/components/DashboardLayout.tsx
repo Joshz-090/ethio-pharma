@@ -8,6 +8,7 @@ import {
   User, Bell, ChevronLeft, ChevronRight, Activity,
   Pill, LogOut, Settings,
 } from 'lucide-react';
+import { logout } from '@/services/api';
 
 const navItems = [
   { label: 'Overview',      href: '/pharmacist',             icon: LayoutDashboard },
@@ -173,6 +174,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <NavItem key={item.href} {...item} isActive={pathname.startsWith(item.href)} collapsed={collapsed} />
           ))}
           <motion.button
+            onClick={logout}
             whileHover={{ x: collapsed ? 0 : 4 }}
             style={{
               display: 'flex', alignItems: 'center', gap: 12,
