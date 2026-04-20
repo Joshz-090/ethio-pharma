@@ -23,6 +23,7 @@ class Inventory(models.Model):
     quantity = models.IntegerField(default=0)
     
     # Professional Medical Details
+    brand = models.CharField(max_length=255, null=True, blank=True) # e.g., Panadol, GS-Amox
     strength = models.CharField(max_length=50, null=True, blank=True) # e.g., 500mg, 1g
     route = models.CharField(max_length=50, null=True, blank=True)     # e.g., PO, IV/IM, Topical
     frequency = models.CharField(max_length=100, null=True, blank=True) # e.g., BID, TID, PRN
