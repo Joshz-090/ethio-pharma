@@ -1,45 +1,47 @@
-# 🛡️ MedLink Arba Minch: Backend Core
+# 🛡️ Ethio-Pharma Backend Core
 
 ### Overview
-This is the heart of the MedLink ecosystem. It is a **multi-tenant Django REST Framework** project designed to handle pharmacies with strict data isolation.
+This is the heart of the Ethio-Pharma ecosystem. It is a **multi-tenant Django REST Framework** project designed to handle thousands of pharmacies with strict data isolation.
 
 ### 🛠️ Technical Stack
 - **Framework**: Django 4.2+ & Django REST Framework
 - **Primary Database**: PostgreSQL (Supabase)
-- **Authentication**: JWT (SimpleJWT)
-- **Design Pattern**: Service-Selector Pattern (Decouples logic from database queries).
+- **Authentication**: JWT (SimpleJWT) with multi-tenant claims
+- **Isolation**: Custom `PharmacyManager` for logical data partitioning
 
-### 🚀 Developer Setup (Quick Start)
+### 📂 Directory Structure
+- `accounts/`: Custom user models supporting roles (Admin, Owner, Cashier) and pharmacy linkage.
+- `pharmacies/`: The tenant core. Manages pharmacy profiles, licenses, and subscriptions.
+- `inventory/`: 
+    - `GlobalMedicine`: Shared Registry for verified medicines (EFDA synced).
+    - `Inventory`: Tenant-specific stock records.
+- `sales/`: Atomic transaction engine for high-speed POS sales.
+- `analytics/`: Data aggregation for AI stock prediction and daily business insights.
+- `core/`: Project configuration, URL routing, and security settings.
+
+### 🚀 Developer Setup
 1. **Virtual Environment**: 
    ```bash
    python -m venv venv
-   venv\Scripts\activate
+   source venv/bin/activate # Windows: venv\Scripts\activate
    ```
 2. **Dependencies**:
    ```bash
    pip install -r requirements.txt
    ```
-3. **Configuration**:
-   Copy `.env.example` to `.env` and fill in the Supabase details provided in Telegram.
-
-4. **Initialize Data** (CRITICAL for testing):
+3. **Database Reset & Sync**:
    ```bash
+   python reset_db.py           # Required for UUID Migration (Development only)
+   python manage.py makemigrations
    python manage.py migrate
-   python apps/medicines/scripts/import_efda.py  # Loads medicine catalog
-   python generate_test_data.py                  # Generates fake pharmacies & stock
+   python inventory/scripts/import_efda.py # Import EFDA catalog
    ```
-
-5. **Run Server**:
+4. **Run Server**:
    ```bash
    python manage.py runserver
    ```
 
-### 📡 API Testing
-- **Search Inventory**: `GET /api/inventory/`
-- **Register User**: `POST /api/auth/register/`
-- **Admin Panel**: `http://127.0.0.1:8000/admin/` (User: `admin` / `admin123`)
-
----
-
-### 👥 Team Contribution
-If you change a model, run `python manage.py makemigrations`. **Always pull before you push.**
+### 📋 Integration Notes
+- All endpoints are strictly multi-tenant.
+- Use the `X-Pharmacy-ID` header or JWT claims for tenant awareness.
+- Precision decimals are used for all currency calculations.
