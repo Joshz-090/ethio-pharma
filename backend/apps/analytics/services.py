@@ -3,11 +3,11 @@ from django.utils import timezone
 from datetime import timedelta
 from .models import SearchHistory, DailyPharmacyInsights
 
-def log_search(query: str, sector: str = None):
+def log_search(query: str, user=None, sector: str = None):
     """
     Logs a user search query for trend analysis.
     """
-    return SearchHistory.objects.create(query=query, sector=sector)
+    return SearchHistory.objects.create(query=query, user=user, sector=sector)
 
 def get_top_searched_medicines(sector: str = None, days: int = 7):
     """

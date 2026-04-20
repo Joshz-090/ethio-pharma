@@ -1,22 +1,15 @@
-from rest_framework import viewsets, permissions
-from rest_framework.decorators import action
-from common.utils import api_response
-from .services.analytics_service import AnalyticsService
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from .selectors import get_personalized_trends
 
-class AnalyticsViewSet(viewsets.ViewSet):
+class TrendingMedicinesView(APIView):
     """
-    Dedicated Analytics ViewSet for Dashboards and Reports.
+    API Endpoint for showing global trends and user-specific history.
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [AllowAny]
 
-    @action(detail=False, methods=['get'])
-    def dashboard(self, request):
-        """Returns the high-level business summary for the active pharmacy."""
-        data = AnalyticsService.get_dashboard_summary(request.user.pharmacy)
-        return api_response(success=True, data=data)
-
-    @action(detail=False, methods=['get'])
-    def stock_report(self, request):
-        """Returns detailed stock health insights."""
-        data = AnalyticsService.get_stock_report(request.user.pharmacy)
-        return api_response(success=True, data=data)
+    def get(self, request):
+        limit = int(request.query_params.get('limit', 5))
+        trends = get_personalized_trends(user=request.user, limit=limit)
+        return Response(trends)

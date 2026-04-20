@@ -45,7 +45,7 @@ class InventoryViewSet(viewsets.ModelViewSet):
         long = request.query_params.get('long')
         
         # Log for AI analytics
-        log_search(query=query, sector=sector)
+        log_search(query=query, user=request.user if request.user.is_authenticated else None, sector=sector)
         
         # Execute localized search logic with GPS sorting
         results = search_medicines_by_sector(

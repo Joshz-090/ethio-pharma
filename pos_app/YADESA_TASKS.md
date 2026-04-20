@@ -60,6 +60,20 @@ Used for the home screen or "Hot Medicines" section.
 
 ---
 
+## 🔥 Step 6: Personalized Trends & History
+To make the home screen look alive, use the Trending endpoint.
+- **Endpoint**: `GET /analytics/trending/?limit=5` (Pass Auth token for history)
+- **Response**:
+  ```json
+  {
+    "global_trending": ["Amoxicillin", "Insulin", ...],
+    "user_recent": ["Paracetamol", "Ibuprofen", ...]
+  }
+  ```
+- **UI Tip**: Show "Trending in Arba Minch" at the top and "Your Recent History" below it.
+
+---
+
 ### 💡 Pro-Tips for Yadesa:
 1.  **Error Handling**: If a reservation fails because stock is gone, the backend will return a `400 Bad Request`. Show a message: "Sorry, someone just took the last box!"
 2.  **Debounced Search**: When the user is typing in the search bar, wait 300ms before calling the API to save battery and data.

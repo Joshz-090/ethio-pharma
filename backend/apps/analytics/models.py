@@ -7,6 +7,7 @@ class SearchHistory(models.Model):
     """Logs every search for AI demand analysis"""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     query = models.CharField(max_length=255)
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, null=True, blank=True, related_name='search_history')
     sector = models.CharField(max_length=50, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
