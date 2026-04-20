@@ -5,18 +5,18 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:ethio_pharma_pos/app.dart';
-import 'package:ethio_pharma_pos/main.dart';
+import 'package:medlink_patient/app.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('App shows MedLink branding on login', (
+    WidgetTester tester,
+  ) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const EthioPharmaApp());
 
-    // Verify that the POS screen is loaded.
-    expect(find.text('Pharmacy POS'), findsOneWidget);
+    // Verify that login screen branding is visible.
+    expect(find.text('MedLink Arba Minch'), findsOneWidget);
   });
 }

@@ -9,28 +9,15 @@ The `pos_app` is the primary interface for **Pharmacists** in Arba Minch. It is 
 - **Expiry Monitoring**: Visual alerts for medicines approaching expiration.
 - **Offline Sync**: Caching inventory data locally to ensure the pharmacy can operate during internet outages.
 
-## ✅ Day 1-2 Progress Audit
-- [x] Flutter Layout Skeleton (Adaptive Windows UI) completed.
-- [x] Local Database (SQLite) configured for medicine registry.
-- [x] Inventory CRUD operations implemented.
-- [x] Global Medicine Search (Local lookup) operational.
+## 🏗️ Flutter Architecture
+- **Lib/Api**: Dio-based client calling the Django backend.
+- **Lib/Providers**: Riverpod-based state management for inventory and search.
+- **Lib/Screens**: 
+    - `InventoryScreen`: CRUD for local stock.
+    - `ReservationScreen`: List of active Holds for users.
+    - `SearchScreen`: Quick lookup of global medicine registry.
 
-## 🏁 Day 3: Final Integration & Offline Power (TODAY)
-Today we finish the "Industrial" side of Ethio-Pharma.
-
-1.  **Fulfillment Logic**:
-    *   In `lib/screens/ReservationScreen`, add a "Mark as Picked Up" button.
-    *   This must call `PATCH /api/reservations/{id}/` to finalize the stock deduction.
-2.  **Robust Offline Sync**:
-    *   Implement a simple local queue for "Stock Updates".
-    *   When the internet (Supabase connection) returns, use a background service to push updates.
-3.  **Search Performance**:
-    *   Ensure the local medicine catalog search is instantaneous (under 100ms).
-4.  **Final Build**:
-    *   Generate the Windows `.exe` and Android `.apk` for the presentation.
-
-## ⏱️ Day 3 Milestones
-- [ ] Connect to live `inventory` and `reservations` API endpoints.
-- [ ] Implement the "Reserved" list fulfillment view.
-- [ ] Add "Low Stock" visual alerts (Red highlights).
-- [ ] Final stress test (500 items in inventory).
+## ⏱️ 1-Week Goals
+- [ ] Connect to the new `inventory` and `reservations` API endpoints.
+- [ ] Implement the "Reserved" list view.
+- [ ] Add "Expiry Date" sorting and highlights.
