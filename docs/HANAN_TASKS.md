@@ -2,25 +2,25 @@
 
 Hanan, your role is the most strategic. You need to make the system "Smart" and ensure our documentation is winning-quality for the project judges.
 
-## 🎯 Your Tasks for Today
+## 📅 Day 2: AI Features & Pitch (TOMORROW)
+1.  **Prescription OCR**:
+    *   In `docs/ai/ocr_service.py`, use the `pytesseract` library to extract text from a medicine prescription image.
+    *   Run: `pip install pytesseract pillow`.
+    *   Write a function `def extract_medicine_names(image_path: str) -> list[str]` that reads the image and returns a list of potential medicine names.
+    *   Test it against a sample prescription scan and log the output.
+2.  **Demand Predictor**:
+    *   In `docs/ai/demand_predictor.py`, write a function that takes medicine names as input and queries the backend API.
+    *   Return a list like: `[{"medicine": "Amoxicillin", "weekly_searches": 45, "restock_urgency": "HIGH"}]`.
+3.  **Pitch Deck Slides**:
+    *   Create a Google Slides or PowerPoint file with exactly **5 slides**:
+        *   Slide 1: The Problem (People in Arba Minch can't find medicine fast).
+        *   Slide 2: The Solution (MedLink: Search, Reserve, Pickup).
+        *   Slide 3: The Technology (Show the architecture diagram).
+        *   Slide 4: The Team (Eyasu, Yadesa, Misiker, Hanan - with roles).
+        *   Slide 5: Live Demo QR Code linking to `https://ethio-pharma.onrender.com/api/`.
 
-### 1. Smart Architecture Design (AI Concepts)
-Design and document how we will implement:
-*   **Predictive Stocking**: Use historical search data (from Eyasu's backend) to warn pharmacies about upcoming medicine shortages before they happen.
-*   **Voice Search Support**: Document how a patient in Arba Minch can search for medicine using voice (Amharic speech-to-text).
-*   **Demand Heatmaps**: Design a document showing how we will visualize medicine "Hotspots" in Arba Minch sectors (Sikela vs Secha).
-
-### 2. Technical Documentation Polish
-*   **API Design**: Fill out `docs/api_design.md` with every exact endpoint Yadesa and Misiker need.
-*   **Problem/Solution Alignment**: Ensure `docs/solution.md` perfectly matches what the team is building today.
-
-### 3. "Smart Med" Logic
-Collaborate with Eyasu to design a "Popularity Score" model. How do we determine which medicine is most important today?
-
-## 📄 Key Files to Edit
-- `docs/api_design.md`
-- `docs/AI_SMART_GOALS.md` (Create this file!)
-- `docs/architecture.md` (Add the AI/Analytics layer).
-
-## 📡 Deliverable
-A "Technical Whitepaper" in the `docs/` folder that explains the AI/Smart features to the judges in a way that WOWs them.
+    ### Day 2 Implementation Status
+    - `docs/ai/ocr_service.py`: Implemented with `extract_medicine_names(image_path: str) -> list[str]`
+    - `docs/ai/demand_predictor.py`: Implemented demand prediction helper
+    - `docs/ai/README.md`: Added install + run instructions for both AI prototypes
+    - `docs/pitch_deck_outline.md`: Added 5-slide ready outline for judges
