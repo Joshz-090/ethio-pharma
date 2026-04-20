@@ -22,6 +22,15 @@ class Pharmacy(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def is_subscription_valid(self):
+        from datetime import date
+        if self.status != 'approved':
+            return False
+        if self.subscription_expiry and self.subscription_expiry < date.today():
+            return False
+        return True
+
     class Meta:
         verbose_name_plural = "Pharmacies"
 
