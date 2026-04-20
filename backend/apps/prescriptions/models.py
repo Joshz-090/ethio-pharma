@@ -7,7 +7,8 @@ class Prescription(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='prescriptions')
     pharmacy = models.ForeignKey(Pharmacy, on_delete=models.CASCADE, related_name='prescriptions', null=True, blank=True)
-    image_url = models.URLField(max_length=500)  # We will upload to Supabase storage
+    image_url = models.URLField(max_length=500)
+    detected_medicines = models.JSONField(default=list, blank=True)  # Store names found by Hanan's AI
     
     STATUS_CHOICES = [
         ('pending', 'Pending Approval'),

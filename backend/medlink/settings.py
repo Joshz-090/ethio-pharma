@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'prescriptions',
     'analytics',
     'reminders',
+    'ai_integration',
     'core',
 ]
 
