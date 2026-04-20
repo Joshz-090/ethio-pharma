@@ -1,24 +1,21 @@
 # MedLink: Arba Minch
 
-![MedLink logo](docs/assets/medlink-logo.svg)
+[![MedLink](https://img.shields.io/badge/MedLink-Arba%20Minch-2e7d32?style=for-the-badge&logo=leaflet&logoColor=white)](README.md)
+[![Backend](https://img.shields.io/badge/API-Django%20REST-092E20?style=for-the-badge&logo=django&logoColor=white)](backend/)
+[![Mobile](https://img.shields.io/badge/Mobile-Flutter%203.x-02569B?style=for-the-badge&logo=flutter&logoColor=white)](pos_app/)
+[![Data](https://img.shields.io/badge/Data-PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)](backend/)
+[![Docs](https://img.shields.io/badge/Docs-Technical%20Reference-1565C0?style=for-the-badge&logo=readthedocs&logoColor=white)](docs/)
 
 **A pharmaceutical ecosystem for fast medicine discovery, reservation, and prescription handling in Arba Minch.**
 
-MedLink connects patients, pharmacists, and admins through a secure Django REST API, a Flutter mobile app, and a web dashboard concept for pharmacy operations. The goal is simple: reduce medicine search time, make reservations reliable, and keep prescription handling safe.
+MedLink connects patients, pharmacists, and admins through a secure Django REST API, a Flutter mobile app, and a web dashboard for pharmacy operations. The goal is simple: reduce medicine search time, make reservations reliable, and keep prescription handling safe.
 
 ## Why MedLink Matters
 
 - Patients can search across pharmacies instead of walking from store to store.
 - Pharmacists can manage inventory, reservations, and prescription approvals in one place.
 - Admins can monitor system activity and sales with a clean role-based flow.
-- Judges can see a practical MVP with a clear path from problem to demo.
-
-## What Judges Should Notice
-
-1. Role separation is explicit: patient, pharmacist, and admin.
-2. The backend is modular: users, pharmacies, medicines, reservations, prescriptions, sales, analytics.
-3. The system is designed for a real workflow, not just a prototype screen.
-4. Documentation is organized so the project can be explained quickly and tested easily.
+- The product is designed around a realistic workflow with clear operational value.
 
 ## System at a Glance
 
@@ -92,7 +89,7 @@ sequenceDiagram
 
 For the full API specification, see [docs/api_design.md](docs/api_design.md).
 
-## Demo Flow for Judges
+## Demo Flow
 
 1. Register a patient or use a test account.
 2. Search medicine availability.
@@ -131,4 +128,4 @@ flutter run
 
 - Keep the demo short and visual.
 - Show the problem, the search flow, and the role-based action path.
-- Use the documentation links above as your support material during judging.
+- Use the documentation links above as your support material.
