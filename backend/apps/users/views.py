@@ -1,6 +1,7 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status, generics
+from rest_framework.response import Response
 from .models import User, UserProfile
-from .serializers import UserProfileSerializer
+from .serializers import UserProfileSerializer, RegisterSerializer
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     """
@@ -16,3 +17,20 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             return UserProfile.objects.all()
         # Users see only their own profile
         return UserProfile.objects.filter(user=self.request.user)
+
+class RegisterView(generics.CreateAPIView):
+    """
+    Public registration endpoint.
+    """
+    permission_classes = [permissions.AllowAny]
+    serializer_class = RegisterSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "message": "User created successfully",
+                "user": serializer.data
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

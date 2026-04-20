@@ -9,11 +9,29 @@ This guide provides the technical map for connecting the Flutter mobile app to t
 
 ---
 
-## 🔐 Step 1: Authentication (JWT)
+## 🔐 Step 1: Registration & Login (The Entry Point)
+To use the app, users must either create an account or log in.
+
+### A. New Account (Register)
+- **Endpoint**: `POST /users/register/`
+- **Method**: AllowAny (No token needed)
+- **Payload**:
+  ```json
+  {
+    "username": "...",
+    "email": "...",
+    "password": "...",
+    "role": "patient", 
+    "phone_number": "..."
+  }
+  ```
+- **Note**: Use `"patient"` for users and `"pharmacist"` for pharmacy staff.
+
+### B. Login (JWT)
 Before making any requests for reservations, you must log the user in.
 - **Endpoint**: `POST /token/`
-- **Payload**: `{"email": "...", "password": "..."}`
-- **Note**: Save the `access` token in secure storage. All subsequent private requests must include the header: 
+- **Payload**: `{"username": "...", "password": "..."}`
+- **Note**: Save the `access` token in secure storage. All private requests must include the header: 
   `Authorization: Bearer <your_access_token>`
 
 ---
