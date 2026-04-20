@@ -29,4 +29,4 @@ class InventorySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Inventory
-        fields = ['id', 'pharmacy', 'medicine', 'price', 'quantity', 'usage_instructions']
+        fields = '__all__'

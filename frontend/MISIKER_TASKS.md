@@ -37,9 +37,11 @@ This guide provides the technical roadmap for connecting the Next.js web applica
 ---
 
 ## 💊 Section B: The Pharmacy Dashboard (Feature List)
-- [ ] **Inventory Control**:
-  - Search/Select from the Master Catalog to keep names consistent.
-  - Add Custom Advice to the `usage_instructions` field.
+- [ ] **Inventory Control (New Product Entry)**:
+  - **Auto-Fill**: Search/Select from the Master Catalog to keep names consistent.
+  - **Medical Details**: Capture `strength` (500mg), `route` (PO), `frequency` (BID), and `duration` (10 days).
+  - **Safety**: Capture `expiry_date` (Show red if expired!) and `batch_number`.
+  - **Advice**: Add Custom Advice to the `usage_instructions` field.
 - [ ] **AI Prescription Room**: 
   - A side-by-side view: **[Original Photo]** | **[Editable AI List]**.
   - A "Verify & Save" button to finalize the data.
