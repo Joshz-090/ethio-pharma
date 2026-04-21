@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, ReactNode } from 'react';
+import { useState, ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,6 +8,7 @@ import {
   User, Bell, ChevronLeft, ChevronRight, Activity,
   Pill, LogOut, Settings,
 } from 'lucide-react';
+import { logout } from '@/services/api';
 
 const navItems = [
   { label: 'Overview',      href: '/pharmacist',             icon: LayoutDashboard },
@@ -77,20 +78,12 @@ function NavItem({ label, href, icon: Icon, isActive, collapsed }: NavItemProps)
 interface DashboardLayoutProps { children: ReactNode }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const [mounted, setMounted] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
-  
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   const sidebarW = collapsed ? 72 : 260;
-  
-  // Prevent hydration mismatch by only rendering time-specific info on client
   const now = new Date();
-  const timeStr = mounted ? now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '--:--';
-  const dateStr = mounted ? now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : '...';
+  const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  const dateStr = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--color-bg-base)' }}>
@@ -181,6 +174,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <NavItem key={item.href} {...item} isActive={pathname.startsWith(item.href)} collapsed={collapsed} />
           ))}
           <motion.button
+            onClick={logout}
             whileHover={{ x: collapsed ? 0 : 4 }}
             style={{
               display: 'flex', alignItems: 'center', gap: 12,

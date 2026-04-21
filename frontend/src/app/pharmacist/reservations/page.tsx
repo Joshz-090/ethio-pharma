@@ -4,8 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, CheckCircle2, XCircle, AlertOctagon, Package } from 'lucide-react';
 import PageHeader from '@/components/ui/PageHeader';
 import StatusBadge from '@/components/ui/StatusBadge';
-import { mockReservations, Reservation, ReservationStatus } from '@/lib/mockData';
-import { fulfillReservation, cancelReservation } from '@/services/api';
+import { Reservation, ReservationStatus } from '@/lib/mockData';
+import { getReservations, fulfillReservation, cancelReservation } from '@/services/api';
 
 const TABS: { label: string; value: ReservationStatus | 'all'; icon: React.ElementType; color: string }[] = [
   { label: 'All',       value: 'all',       icon: Package,       color: '#94a3b8' },
@@ -158,8 +158,36 @@ function ReservationCard({
 }
 
 export default function ReservationsPage() {
-  const [reservations, setReservations] = useState<Reservation[]>(mockReservations);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<ReservationStatus | 'all'>('all');
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      const data = await getReservations();
+      // Map backend schema to frontend component shape
+      const mapped = data.map((d: any) => ({
+        id: d.id,
+        medicineName: d.inventory?.medicine?.name || 'Unknown Medicine',
+        patientCode: d.user ? `USR-${d.user.toString().slice(0, 6)}` : 'Anonymous',
+        quantity: d.quantity,
+        unitPrice: d.inventory?.unit_price || 0,
+        status: d.status || 'pending',
+        reservedAt: d.created_at || new Date().toISOString(),
+        expiresAt: d.expires_at || new Date(Date.now() + 3600000).toISOString(),
+      }));
+      setReservations(mapped);
+    } catch (err) {
+      console.error('Failed to load reservations', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const counts = {
     all:       reservations.length,

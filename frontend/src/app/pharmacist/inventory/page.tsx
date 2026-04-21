@@ -1,12 +1,12 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, Plus } from 'lucide-react';
 import PageHeader from '@/components/ui/PageHeader';
 import InventoryTable from '@/components/inventory/InventoryTable';
 import EditStockModal from '@/components/inventory/EditStockModal';
-import { mockInventory, InventoryItem, InventoryStatus } from '@/lib/mockData';
-import { updateStock, toggleAvailability } from '@/services/api';
+import { InventoryItem, InventoryStatus } from '@/lib/mockData';
+import { getInventory, updateStock, toggleAvailability } from '@/services/api';
 
 const CATEGORIES = ['All', 'Painkiller', 'Antibiotic', 'Diabetes', 'Antimalarial', 'Gastric', 'Vitamin', 'Respiratory', 'Hydration'];
 const STATUSES: { label: string; value: InventoryStatus | 'all' }[] = [
@@ -20,13 +20,41 @@ const STATUSES: { label: string; value: InventoryStatus | 'all' }[] = [
 const PAGE_SIZE = 8;
 
 export default function InventoryPage() {
-  const [items, setItems] = useState<InventoryItem[]>(mockInventory);
+  const [items, setItems] = useState<InventoryItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
   const [status, setStatus] = useState<'all' | InventoryStatus>('all');
   const [page, setPage] = useState(1);
   const [editItem, setEditItem] = useState<InventoryItem | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      const data = await getInventory();
+      // Map backend schema to frontend component schema
+      const mapped = data.map((d: any) => ({
+        id: d.id,
+        medicineName: d.medicine?.name || 'Unknown',
+        genericName: d.medicine?.generic_name || '',
+        category: d.medicine?.category || 'Other',
+        quantityOnHand: d.quantity_on_hand,
+        unitPrice: d.unit_price,
+        isAvailable: d.is_available,
+        status: d.quantity_on_hand === 0 ? 'out_of_stock' : d.quantity_on_hand < 10 ? 'low_stock' : 'in_stock'
+      }));
+      setItems(mapped);
+    } catch (err) {
+      console.error('Failed to load inventory', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const filtered = items.filter(item => {
     const matchSearch = item.medicineName.toLowerCase().includes(search.toLowerCase()) ||
@@ -137,7 +165,13 @@ export default function InventoryPage() {
       {/* Table */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
         className="card" style={{ overflow: 'hidden' }}>
-        <InventoryTable items={paginated} onEdit={handleEdit} onToggle={handleToggle} />
+        {isLoading ? (
+          <div className="flex justify-center p-12">
+            <span className="w-8 h-8 border-4 border-slate-600 border-t-teal-500 rounded-full animate-spin" />
+          </div>
+        ) : (
+          <InventoryTable items={paginated} onEdit={handleEdit} onToggle={handleToggle} />
+        )}
 
         {/* Pagination */}
         {totalPages > 1 && (
