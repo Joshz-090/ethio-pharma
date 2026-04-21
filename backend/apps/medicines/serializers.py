@@ -18,10 +18,14 @@ class MedicineSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'category', 'description', 'requires_prescription', 'reviews', 'average_rating']
 
     def get_average_rating(self, obj):
-        reviews = obj.reviews.all()
-        if not reviews:
-            return 0
-        return sum(r.rating for r in reviews) / len(reviews)
+        try:
+            reviews = obj.reviews.all()
+            if not reviews:
+                return 0.0
+            total = sum(r.rating for r in reviews if r.rating is not None)
+            return round(total / len(reviews), 1)
+        except Exception:
+            return 0.0
 
 class InventorySerializer(serializers.ModelSerializer):
     medicine = MedicineSerializer(read_only=True)

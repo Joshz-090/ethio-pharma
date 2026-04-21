@@ -42,12 +42,12 @@ export default function LoginPage() {
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         .login-wrapper { font-family: 'Inter', system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; }
         .login-input { height: 44px; padding: 0 16px; border-radius: 12px; border: 2px solid #f3f4f6; background-color: #f9fafb; font-size: 14px; width: 100%; outline: none; transition: all 0.2s; color: #111827; }
-        .login-input:focus { background-color: #ffffff; border-color: #4f46e5; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
-        .login-btn { height: 44px; border-radius: 12px; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); color: white; font-weight: 700; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; cursor: pointer; transition: all 0.2s; box-shadow: 0 8px 16px -4px rgba(79, 70, 229, 0.3); border: none; }
-        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -4px rgba(79, 70, 229, 0.4); }
+        .login-input:focus { background-color: #ffffff; border-color: #059669; box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.1); }
+        .login-btn { height: 44px; border-radius: 12px; background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; font-weight: 700; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; cursor: pointer; transition: all 0.2s; box-shadow: 0 8px 16px -4px rgba(5, 150, 105, 0.3); border: none; }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -4px rgba(5, 150, 105, 0.4); }
         .login-card { background: white; border-radius: 28px; padding: 32px; box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.1); border: 1px solid #f3f4f6; position: relative; z-index: 10; width: 100%; max-width: 420px; }
         .login-tab-btn { flex: 1; padding: 10px 0; font-size: 13px; font-weight: 700; border-radius: 10px; border: none; cursor: pointer; transition: all 0.2s; }
-        .login-tab-active { background: #4f46e5; color: white; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25); }
+        .login-tab-active { background: #059669; color: white; box-shadow: 0 4px 10px rgba(5, 150, 105, 0.25); }
         .login-tab-inactive { background: transparent; color: #6b7280; }
         .feature-box { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border-radius: 16px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px); }
       `}} />
@@ -55,7 +55,7 @@ export default function LoginPage() {
       <div className="login-wrapper" style={{ display: 'flex', backgroundColor: '#f9fafb' }}>
         
         {/* ─── LEFT: Brand Panel ─── */}
-        <div className="hidden lg:flex relative flex-col justify-between overflow-hidden" style={{ display: 'flex', width: '45%', background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' }}>
+        <div className="hidden lg:flex relative flex-col justify-between overflow-hidden" style={{ display: 'flex', width: '45%', background: 'linear-gradient(135deg, #059669 0%, #047857 100%)' }}>
           
           <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.15, pointerEvents: 'none', zIndex: 0 }}>
             <div style={{ position: 'absolute', width: 250, height: 250, border: '1px solid white', borderRadius: '50%' }} />
@@ -67,7 +67,7 @@ export default function LoginPage() {
             
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 12px rgba(0,0,0,0.1)' }}>
-                <Plus size={22} color="#2563eb" strokeWidth={4} />
+                <Plus size={22} color="#059669" strokeWidth={4} />
               </div>
               <div style={{ display: 'flex', alignItems: 'baseline' }}>
                 <span style={{ color: 'white', fontSize: '24px', fontWeight: 900, letterSpacing: '-0.5px' }}>MedLink</span>
@@ -189,9 +189,9 @@ export default function LoginPage() {
                 <p style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280', marginBottom: '12px' }}>New to MedLink?</p>
                 <a
                   href="/register"
-                  style={{ width: '100%', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', borderRadius: '12px', border: '2px solid #f3f4f6', color: '#4f46e5', fontSize: '14px', fontWeight: 800, textDecoration: 'none', transition: 'all 0.2s' }}
-                  onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f9fafb'}
-                  onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                  style={{ width: '100%', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', borderRadius: '12px', border: '2px solid #f3f4f6', color: '#059669', fontSize: '14px', fontWeight: 800, textDecoration: 'none', transition: 'all 0.2s' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#ecfdf5')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                 >
                   Register Your Pharmacy <ArrowRight size={14} />
                 </a>

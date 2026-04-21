@@ -98,20 +98,20 @@ export default function RegisterPage() {
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         .reg-wrapper { font-family: 'Inter', system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; }
         .reg-input { height: 44px; padding: 0 16px; border-radius: 12px; border: 2px solid #f3f4f6; background-color: #f9fafb; font-size: 14px; width: 100%; outline: none; transition: all 0.2s; color: #111827; box-sizing: border-box; }
-        .reg-input:focus { background-color: #ffffff; border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08); }
-        .reg-btn { height: 44px; border-radius: 12px; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white; font-weight: 700; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; cursor: pointer; transition: all 0.2s; box-shadow: 0 8px 16px -4px rgba(37, 99, 235, 0.3); border: none; }
-        .reg-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 20px -4px rgba(37, 99, 235, 0.4); }
+        .reg-input:focus { background-color: #ffffff; border-color: #059669; box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.08); }
+        .reg-btn { height: 44px; border-radius: 12px; background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; font-weight: 700; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; cursor: pointer; transition: all 0.2s; box-shadow: 0 8px 16px -4px rgba(5, 150, 105, 0.3); border: none; }
+        .reg-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 20px -4px rgba(5, 150, 105, 0.4); }
         .reg-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .reg-card { background: white; border-radius: 28px; padding: 32px; box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.1); border: 1px solid #f3f4f6; width: 100%; max-width: 440px; }
         .upload-zone { border: 2px dashed #e2e8f0; background: #f8fafc; border-radius: 16px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px; min-height: 140px; position: relative; overflow: hidden; }
-        .upload-zone:hover { border-color: #2563eb; background: #eff6ff; }
+        .upload-zone:hover { border-color: #059669; background: #ecfdf5; }
         .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
       `}} />
 
       <div className="reg-wrapper" style={{ display: 'flex', backgroundColor: '#f8fafc' }}>
 
         {/* ─── LEFT PANEL ─── */}
-        <div style={{ display: 'flex', width: '42%', background: 'linear-gradient(160deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%)', position: 'relative', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', width: '42%', background: 'linear-gradient(160deg, #064e3b 0%, #059669 50%, #10b981 100%)', position: 'relative', flexDirection: 'column' }}>
           <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.12, pointerEvents: 'none' }}>
             {[250, 450, 650].map(s => <div key={s} style={{ position: 'absolute', width: s, height: s, border: '1px solid white', borderRadius: '50%' }} />)}
           </div>
@@ -141,7 +141,7 @@ export default function RegisterPage() {
                   <div key={s.number} style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                     <div style={{ width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '13px', fontWeight: 800, transition: 'all 0.3s',
                       background: step > s.number ? '#22c55e' : step === s.number ? 'white' : 'rgba(255,255,255,0.1)',
-                      color: step > s.number ? 'white' : step === s.number ? '#1d4ed8' : 'rgba(255,255,255,0.35)',
+                      color: step > s.number ? 'white' : step === s.number ? '#047857' : 'rgba(255,255,255,0.35)',
                       border: step > s.number ? 'none' : step === s.number ? 'none' : '1px solid rgba(255,255,255,0.2)',
                       boxShadow: step === s.number ? '0 4px 12px rgba(0,0,0,0.15)' : 'none'
                     }}>
@@ -168,7 +168,7 @@ export default function RegisterPage() {
               style={{ width: '100%', maxWidth: '420px', display: 'flex', flexDirection: 'column' }}>
               
               <div style={{ marginBottom: '24px' }}>
-                <p style={{ fontSize: '10px', fontWeight: 900, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '8px' }}>
+                <p style={{ fontSize: '10px', fontWeight: 900, color: '#059669', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '8px' }}>
                   Step {step} of 4
                 </p>
                 <h2 style={{ fontSize: '30px', fontWeight: 900, color: '#0f172a', letterSpacing: '-1px', marginBottom: '6px' }}>
@@ -256,19 +256,19 @@ export default function RegisterPage() {
                   <form onSubmit={handlePaymentSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     
                     {/* Payment Info Card */}
-                    <div style={{ padding: '16px', borderRadius: '16px', background: 'linear-gradient(135deg, #eff6ff, #dbeafe)', border: '1px solid #bfdbfe' }}>
+                    <div style={{ padding: '16px', borderRadius: '16px', background: 'linear-gradient(135deg, #ecfdf5, #d1fae5)', border: '1px solid #a7f3d0' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
-                        <div style={{ width: 36, height: 36, borderRadius: '10px', background: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ width: 36, height: 36, borderRadius: '10px', background: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <CreditCard size={18} color="white" />
                         </div>
                         <div>
-                          <p style={{ fontSize: '13px', fontWeight: 900, color: '#1e3a8a', marginBottom: 0 }}>Annual Subscription Fee</p>
-                          <p style={{ fontSize: '20px', fontWeight: 900, color: '#2563eb', marginBottom: 0 }}>1,000 ETB</p>
+                          <p style={{ fontSize: '13px', fontWeight: 900, color: '#064e3b', marginBottom: 0 }}>Annual Subscription Fee</p>
+                          <p style={{ fontSize: '20px', fontWeight: 900, color: '#059669', marginBottom: 0 }}>1,000 ETB</p>
                         </div>
                       </div>
-                      <div style={{ background: 'white', borderRadius: '10px', padding: '10px 14px', border: '1px solid #dbeafe' }}>
+                      <div style={{ background: 'white', borderRadius: '10px', padding: '10px 14px', border: '1px solid #a7f3d0' }}>
                         <p style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>Send to Telebirr</p>
-                        <p style={{ fontSize: '18px', fontWeight: 900, color: '#1e3a8a', fontFamily: 'monospace', letterSpacing: '2px' }}>0900 123 456</p>
+                        <p style={{ fontSize: '18px', fontWeight: 900, color: '#064e3b', fontFamily: 'monospace', letterSpacing: '2px' }}>0900 123 456</p>
                         <p style={{ fontSize: '11px', color: '#64748b', marginTop: '4px', fontWeight: 600 }}>Reference: Your pharmacy name</p>
                       </div>
                     </div>
@@ -282,14 +282,14 @@ export default function RegisterPage() {
                         {previewUrl ? (
                           <>
                             <img src={previewUrl} alt="Payment proof" style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0, borderRadius: '14px' }} />
-                            <div style={{ position: 'relative', zIndex: 2, background: 'rgba(255,255,255,0.95)', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 800, color: '#2563eb', border: '1px solid #bfdbfe' }}>
+                            <div style={{ position: 'relative', zIndex: 2, background: 'rgba(255,255,255,0.95)', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 800, color: '#059669', border: '1px solid #a7f3d0' }}>
                               ✓ Screenshot uploaded — tap to change
                             </div>
                           </>
                         ) : (
                           <>
-                            <div style={{ width: 44, height: 44, borderRadius: '12px', background: '#eff6ff', border: '1px solid #dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px' }}>
-                              <Upload size={22} color="#2563eb" />
+                            <div style={{ width: 44, height: 44, borderRadius: '12px', background: '#ecfdf5', border: '1px solid #a7f3d0', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px' }}>
+                              <Upload size={22} color="#059669" />
                             </div>
                             <p style={{ fontSize: '14px', fontWeight: 800, color: '#334155', marginBottom: '4px' }}>Drop screenshot here</p>
                             <p style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px' }}>or click to browse</p>
@@ -343,7 +343,7 @@ export default function RegisterPage() {
               {step < 4 && (
                 <div style={{ marginTop: '24px', textAlign: 'center' }}>
                   <span style={{ fontSize: '12px', fontWeight: 700, color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Already registered? </span>
-                  <a href="/login" style={{ color: '#2563eb', fontSize: '12px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1.5px', marginLeft: '4px', textDecoration: 'none' }}>Sign in</a>
+                  <a href="/login" style={{ color: '#059669', fontSize: '12px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1.5px', marginLeft: '4px', textDecoration: 'none' }}>Sign in</a>
                 </div>
               )}
 

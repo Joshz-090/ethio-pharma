@@ -13,7 +13,7 @@ interface Pharmacy {
   owner_name: string;
   contact_phone: string;
   address: string;
-  verification_status: 'pending' | 'verified' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected' | 'suspended';
   payment_receipt?: string;
   created_at: string;
 }
@@ -45,13 +45,16 @@ export default function AdminPharmaciesPage() {
     if (!confirm('Approve this pharmacy and grant dashboard access?')) return;
     try {
       await approvePharmacy(id);
-      setPharmacies(prev => prev.map(p => p.id === id ? { ...p, verification_status: 'verified' } : p));
+      setPharmacies(prev => prev.map(p => p.id === id ? { ...p, status: 'approved' } : p));
     } catch (err) {
       alert('Failed to approve pharmacy.');
     }
   };
 
-  const filtered = pharmacies.filter(p => p.verification_status === filter);
+  const filtered = pharmacies.filter(p => {
+    if (filter === 'verified') return p.status === 'approved';
+    return p.status === filter;
+  });
 
   return (
     <AuthGuard requiredRole="admin">
@@ -64,17 +67,17 @@ export default function AdminPharmaciesPage() {
 
       {/* Tabs */}
       <div className="flex gap-2 p-1.5 bg-white border border-slate-100 rounded-2xl w-fit shadow-sm">
-        {(['pending', 'verified'] as const).map((status) => (
-          <button key={status} onClick={() => setFilter(status)}
+        {(['pending', 'approved'] as const).map((status) => (
+          <button key={status} onClick={() => setFilter(status === 'approved' ? 'verified' : 'pending' as any)}
             className={`px-6 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl transition-all flex items-center gap-3 ${
-              filter === status ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-400 hover:text-slate-600'
+              (filter === 'verified' && status === 'approved') || (filter === 'pending' && status === 'pending') ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20' : 'text-slate-400 hover:text-slate-600'
             }`}>
-            {status}
-            {status === 'pending' && pharmacies.filter(p => p.verification_status === 'pending').length > 0 && (
+            {status === 'approved' ? 'verified' : status}
+            {status === 'pending' && pharmacies.filter(p => p.status === 'pending').length > 0 && (
               <span className={`w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-black ${
-                filter === status ? 'bg-white text-blue-600' : 'bg-blue-50 text-blue-600'
+                filter === 'pending' ? 'bg-white text-emerald-600' : 'bg-emerald-50 text-emerald-600'
               }`}>
-                {pharmacies.filter(p => p.verification_status === 'pending').length}
+                {pharmacies.filter(p => p.status === 'pending').length}
               </span>
             )}
           </button>
@@ -83,7 +86,7 @@ export default function AdminPharmaciesPage() {
 
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-32 gap-4">
-          <div className="w-12 h-12 border-4 border-slate-100 border-t-blue-600 rounded-full animate-spin" />
+          <div className="w-12 h-12 border-4 border-slate-100 border-t-emerald-600 rounded-full animate-spin" />
           <p className="text-slate-400 font-black text-sm uppercase tracking-widest">Loading Applications…</p>
         </div>
       ) : error ? (
@@ -107,8 +110,8 @@ export default function AdminPharmaciesPage() {
               <div className="p-10 flex-1">
                 <div className="flex items-start justify-between mb-8">
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center border border-blue-100">
-                      <Building2 size={24} className="text-blue-600" />
+                    <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center border border-emerald-100">
+                      <Building2 size={24} className="text-emerald-600" />
                     </div>
                     <div>
                       <h3 className="text-xl font-black text-slate-900 tracking-tight">{pharmacy.name}</h3>
@@ -117,7 +120,7 @@ export default function AdminPharmaciesPage() {
                       </div>
                     </div>
                   </div>
-                  {pharmacy.verification_status === 'verified' && (
+                  {pharmacy.status === 'approved' && (
                     <span className="px-4 py-1.5 bg-green-50 text-green-600 text-[10px] font-black rounded-full uppercase tracking-widest border border-green-100 flex items-center gap-2">
                       <ShieldCheck size={14} /> Verified SaaS
                     </span>
@@ -162,7 +165,7 @@ export default function AdminPharmaciesPage() {
               {filter === 'pending' && (
                 <div className="px-10 py-8 bg-slate-50/50 border-t border-slate-100 flex gap-4">
                   <button onClick={() => handleApprove(pharmacy.id)}
-                    className="flex-1 py-4 px-6 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-blue-500/20 flex items-center justify-center gap-3">
+                    className="flex-1 py-4 px-6 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-3">
                     <CheckCircle size={18} /> Approve & Activate
                   </button>
                   <button className="px-6 py-4 bg-white hover:bg-red-50 text-red-500 border border-slate-200 rounded-2xl transition-all">

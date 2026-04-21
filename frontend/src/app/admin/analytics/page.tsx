@@ -62,7 +62,7 @@ export default function AdminAnalyticsPage() {
 
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-32 gap-4">
-          <div className="w-12 h-12 border-4 border-slate-100 border-t-blue-600 rounded-full animate-spin" />
+          <div className="w-12 h-12 border-4 border-slate-100 border-t-emerald-600 rounded-full animate-spin" />
           <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">Running AI Engine…</p>
         </div>
       ) : error ? (
@@ -90,9 +90,9 @@ export default function AdminAnalyticsPage() {
             <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
               <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between">
                 <h3 className="font-black text-slate-900 flex items-center gap-2 text-xl">
-                  <TrendingUp size={24} className="text-blue-600" /> High-Demand Medicines
+                  <TrendingUp size={24} className="text-emerald-600" /> High-Demand Medicines
                 </h3>
-                <span className="text-xs font-bold text-blue-600 uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full">Top 5 Forecast</span>
+                <span className="text-xs font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full">Top 5 Forecast</span>
               </div>
               <div className="divide-y divide-slate-50">
                 {topItems.map((item, i) => {
@@ -109,7 +109,7 @@ export default function AdminAnalyticsPage() {
                         </div>
                         <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
                           <motion.div initial={{ width: 0 }} animate={{ width: `${(item.predicted_demand / maxDemand) * 100}%` }} 
-                            className="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full" />
+                            className="h-full bg-gradient-to-r from-emerald-600 to-teal-400 rounded-full" />
                         </div>
                         <div className="flex gap-6 mt-4">
                           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
@@ -120,9 +120,9 @@ export default function AdminAnalyticsPage() {
                           </div>
                         </div>
                       </div>
-                      <div className="text-right shrink-0 px-6 py-3 bg-blue-50 rounded-2xl border border-blue-100">
-                        <div className="text-2xl font-black text-blue-700">{item.predicted_demand}</div>
-                        <div className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mt-1">Score</div>
+                      <div className="text-right shrink-0 px-6 py-3 bg-emerald-50 rounded-2xl border border-emerald-100">
+                        <div className="text-2xl font-black text-emerald-700">{item.predicted_demand}</div>
+                        <div className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mt-1">Score</div>
                       </div>
                     </motion.div>
                   );
@@ -134,12 +134,12 @@ export default function AdminAnalyticsPage() {
             <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
               <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between flex-wrap gap-4">
                 <h3 className="font-black text-slate-900 flex items-center gap-2 text-xl">
-                  <MapPin size={24} className="text-blue-600" /> Localized Demand
+                  <MapPin size={24} className="text-emerald-600" /> Localized Demand
                 </h3>
                 <div className="flex gap-2 bg-slate-100 p-1.5 rounded-2xl">
                   {sectors.map(s => (
                     <button key={s} onClick={() => setSectorFilter(s)} 
-                      className={`px-4 py-2 text-xs font-black rounded-xl transition-all uppercase tracking-wider ${sectorFilter === s ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}>
+                      className={`px-4 py-2 text-xs font-black rounded-xl transition-all uppercase tracking-wider ${sectorFilter === s ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}>
                       {s}
                     </button>
                   ))}
@@ -168,7 +168,7 @@ export default function AdminAnalyticsPage() {
                           {p.reservation_count}
                         </td>
                         <td className="px-8 py-5 text-right">
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-black">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-xs font-black">
                             {p.predicted_demand} Demand <ChevronRight size={12} />
                           </span>
                         </td>
@@ -182,21 +182,21 @@ export default function AdminAnalyticsPage() {
 
           {/* Sidebar Stats */}
           <div className="xl:col-span-4 space-y-8">
-            <div className="bg-blue-600 rounded-[2.5rem] p-10 text-white relative overflow-hidden shadow-xl shadow-blue-600/20">
+            <div className="bg-emerald-600 rounded-[2.5rem] p-10 text-white relative overflow-hidden shadow-xl shadow-emerald-600/20">
               <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
               <Activity size={32} className="mb-6 opacity-80" />
               <h4 className="text-5xl font-black mb-2">{predictions.length}</h4>
-              <p className="text-blue-100 font-bold uppercase tracking-widest text-sm">Medicines Monitored</p>
+              <p className="text-emerald-100 font-bold uppercase tracking-widest text-sm">Medicines Monitored</p>
               <div className="mt-10 h-px bg-white/20" />
               <div className="mt-8 space-y-6">
                 <div className="flex justify-between items-end">
                   <div>
                     <p className="text-3xl font-black">{sectors.length - 1}</p>
-                    <p className="text-[10px] font-bold text-blue-100 uppercase tracking-widest mt-1">Active Sectors</p>
+                    <p className="text-[10px] font-bold text-emerald-100 uppercase tracking-widest mt-1">Active Sectors</p>
                   </div>
                   <div>
                     <p className="text-3xl font-black">{predictions.filter(p => p.trend === 'rising').length}</p>
-                    <p className="text-[10px] font-bold text-blue-100 uppercase tracking-widest mt-1">Rising Demand</p>
+                    <p className="text-[10px] font-bold text-emerald-100 uppercase tracking-widest mt-1">Rising Demand</p>
                   </div>
                 </div>
               </div>
@@ -211,7 +211,7 @@ export default function AdminAnalyticsPage() {
                   { title: 'Market Gaps', desc: 'Identification of medicines with high demand but low stock.' }
                 ].map((item, idx) => (
                   <div key={idx} className="flex gap-4">
-                    <div className="w-2 h-2 rounded-full bg-blue-600 mt-2 shrink-0" />
+                    <div className="w-2 h-2 rounded-full bg-emerald-600 mt-2 shrink-0" />
                     <div>
                       <p className="text-sm font-black text-slate-900">{item.title}</p>
                       <p className="text-xs text-slate-500 leading-relaxed mt-1">{item.desc}</p>
