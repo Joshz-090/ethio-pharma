@@ -1,0 +1,101 @@
+=============================
+           USERS             
+=============================
+Username: testuser
+Role: pharmacist
+Email: test@example.com
+-----------------------------
+Username: patient1@gmail.com
+Role: patient
+Email: patient1@gmail.com
+-----------------------------
+Username: patient
+Role: patient
+Email: test_patient@example.com
+-----------------------------
+Username: ya67@gmail.com
+Role: patient
+Email: ya67@gmail.com
+-----------------------------
+Username: patient2@gmail.com
+Role: patient
+Email: patient2@gmail.com
+-----------------------------
+Username: patient3@gmail.com
+Role: patient
+Email: patient3@gmail.com
+-----------------------------
+Username: patient4@gmail.com
+Role: patient
+Email: patient4@gmail.com
+-----------------------------
+Username: testpharm99
+Role: pharmacist
+Email: test99@email.com
+-----------------------------
+Username: admin
+Role: Superadmin/No Profile
+Email: admin@medlink.com
+-----------------------------
+Username: patient5@gmail.com
+Role: patient
+Email: patient5@gmail.com
+-----------------------------
+Username: eyasu
+Role: pharmacist
+Email: eyasuzerihun80@gmail.com
+-----------------------------
+
+=============================
+        PHARMACIES           
+=============================
+Name: Arba Minch Sikela Pharmacy
+Status: approved
+Plan: free
+Staff linked: None
+-----------------------------
+Name: Secha General Pharmacy
+Status: approved
+Plan: free
+Staff linked: None
+-----------------------------
+Name: Abaya Lake Meds
+Status: approved
+Plan: free
+Staff linked: None
+-----------------------------
+Name: Nechisar Health Hub
+Status: approved
+Plan: free
+Staff linked: None
+-----------------------------
+Name: Unity Pharmacy
+Status: approved
+Plan: free
+Staff linked: None
+-----------------------------
+Name: Sikela Health Care
+Status: approved
+Plan: free
+Staff linked: None
+-----------------------------
+Name: Gamo Gofa Meds
+Status: approved
+Plan: free
+Staff linked: None
+-----------------------------
+Name: Sikela Life Pharmacy
+Status: pending
+Plan: free
+Staff linked: None
+-----------------------------
+Name: Test Pharmacy
+Status: pending
+Plan: free
+Staff linked: testuser
+-----------------------------
+Name: Arba Minch
+Status: pending
+Plan: basic
+Staff linked: eyasu
+-----------------------------

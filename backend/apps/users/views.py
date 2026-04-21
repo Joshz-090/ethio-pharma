@@ -1,5 +1,6 @@
 from rest_framework import viewsets, permissions, status, generics
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from .models import User, UserProfile
 from .serializers import UserProfileSerializer, RegisterSerializer
 
@@ -13,10 +14,26 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         # Admin can see all profiles
-        if self.request.user.is_staff or (hasattr(self.request.user, 'profile') and self.request.user.profile.role == 'admin'):
+        if self.request.user.is_staff:
             return UserProfile.objects.all()
         # Users see only their own profile
         return UserProfile.objects.filter(user=self.request.user)
+
+    @action(detail=False, methods=['get'])
+    def me(self, request):
+        """Get current user's profile"""
+        try:
+            profile = UserProfile.objects.get(user=request.user)
+            serializer = self.get_serializer(profile)
+            return Response(serializer.data)
+        except UserProfile.DoesNotExist:
+            # Create profile if it doesn't exist
+            profile = UserProfile.objects.create(
+                user=request.user,
+                role='admin' if request.user.is_staff else 'pharmacist'
+            )
+            serializer = self.get_serializer(profile)
+            return Response(serializer.data)
 
 class RegisterView(generics.CreateAPIView):
     """

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Building2, CheckCircle, XCircle, MapPin, Phone, User, Eye, AlertCircle, Calendar, ShieldCheck, ExternalLink } from 'lucide-react';
 import PageHeader from '@/components/ui/PageHeader';
+import AuthGuard from '@/components/AuthGuard';
 import api, { getPharmacies, approvePharmacy } from '@/services/api';
 
 interface Pharmacy {
@@ -53,8 +54,9 @@ export default function AdminPharmaciesPage() {
   const filtered = pharmacies.filter(p => p.verification_status === filter);
 
   return (
-    <div className="space-y-8 pb-12">
-      <PageHeader
+    <AuthGuard requiredRole="admin">
+      <div className="space-y-8 pb-12">
+        <PageHeader
         title="Network Onboarding"
         subtitle="Review pharmacy applications and verify manual payment receipts for platform activation"
         breadcrumb={['Admin', 'Pharmacies']}
@@ -198,6 +200,7 @@ export default function AdminPharmaciesPage() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+      </div>
+    </AuthGuard>
   );
 }
