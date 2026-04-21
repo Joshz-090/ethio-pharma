@@ -8,7 +8,7 @@ from analytics.services import log_search
 from core.common.permissions import IsAdmin, IsPharmacist, IsPatient
 
 class MedicineViewSet(viewsets.ModelViewSet):
-    queryset = Medicine.objects.all()
+    queryset = Medicine.objects.all().prefetch_related('reviews', 'reviews__user')
     serializer_class = MedicineSerializer
     permission_classes = [permissions.IsAuthenticated]
 

@@ -3,11 +3,17 @@ from .models import Medicine, Inventory, Review
 from pharmacies.serializers import PharmacySerializer
 
 class ReviewSerializer(serializers.ModelSerializer):
-    user_email = serializers.EmailField(source='user.email', read_only=True)
+    user_email = serializers.SerializerMethodField()
     
     class Meta:
         model = Review
         fields = ['id', 'user_email', 'rating', 'comment', 'likes', 'created_at']
+
+    def get_user_email(self, obj):
+        try:
+            return obj.user.email
+        except AttributeError:
+            return "unknown@medlink.com"
 
 class MedicineSerializer(serializers.ModelSerializer):
     reviews = ReviewSerializer(many=True, read_only=True)
