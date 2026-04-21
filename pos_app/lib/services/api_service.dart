@@ -42,7 +42,7 @@ class ApiService {
         }),
       );
 
-      print('Login API Status: ${response.statusCode}');
+
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -53,7 +53,7 @@ class ApiService {
       }
       return false;
     } catch (e) {
-      print('Login Exception: $e');
+
       return false;
     }
   }
@@ -80,7 +80,7 @@ class ApiService {
         }),
       );
 
-      print('Register API Status: ${response.statusCode}');
+
       
       if (response.statusCode == 201) return null;
       if (response.statusCode == 404) return 'Registration endpoint not found on server (404).';
@@ -90,7 +90,7 @@ class ApiService {
       }
       return 'Registration failed (${response.statusCode})';
     } catch (e) {
-      print('Register Exception: $e');
+
       return 'Connection error: $e';
     }
   }
@@ -132,7 +132,7 @@ class ApiService {
       }
       return [];
     } catch (e) {
-      print('Inventory fetch error: $e');
+
       return [];
     }
   }
@@ -156,7 +156,7 @@ class ApiService {
       }
       return null;
     } catch (e) {
-      print('OCR Exception: $e');
+
       return null;
     }
   }
@@ -236,7 +236,7 @@ class ApiService {
         }),
       );
 
-      print('Reservation API Status: ${response.statusCode}');
+
 
       if (response.statusCode == 201) {
         return jsonDecode(response.body);
@@ -249,7 +249,7 @@ class ApiService {
           return null; // Let the UI handle unauthorized properly
         }
         
-        print('Mocking reservation success for demo (status: ${response.statusCode})...');
+
         return {
           'id': 'demo_res_${DateTime.now().millisecondsSinceEpoch}',
           'inventory_item': inventoryItemId,
@@ -266,7 +266,7 @@ class ApiService {
       }
       return null;
     } catch (e) {
-      print('Reservation Exception: $e');
+
       return null;
     }
   }
@@ -283,7 +283,7 @@ class ApiService {
       }
       return [];
     } catch (e) {
-      print('Catalog Exception: $e');
+
       return [];
     }
   }
@@ -295,14 +295,14 @@ class ApiService {
         headers: await _headers,
       );
 
-      print('Fetch Reservations Status: ${response.statusCode}');
+
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       }
       return [];
     } catch (e) {
-      print('Fetch Reservations Exception: $e');
+
       return [];
     }
   }
