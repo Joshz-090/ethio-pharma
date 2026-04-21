@@ -12,6 +12,13 @@ class MedicineViewSet(viewsets.ModelViewSet):
     serializer_class = MedicineSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def list(self, request, *args, **kwargs):
+        try:
+            return super().list(request, *args, **kwargs)
+        except Exception as e:
+            from rest_framework.response import Response
+            return Response({"error": str(e), "detail": "Debug mode enabled by assistant"}, status=500)
+
 class ReviewViewSet(viewsets.ModelViewSet):
     """
     ViewSet for Medicine Reviews.
