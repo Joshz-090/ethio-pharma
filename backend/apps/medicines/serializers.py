@@ -29,9 +29,9 @@ class MedicineSerializer(serializers.ModelSerializer):
             if not reviews:
                 return 0.0
             total = sum(r.rating for r in reviews if r.rating is not None)
-            return round(total / len(reviews), 1)
+            return str(round(total / len(reviews), 1))
         except Exception:
-            return 0.0
+            return "0.0"
 
 class InventorySerializer(serializers.ModelSerializer):
     medicine = MedicineSerializer(read_only=True)
