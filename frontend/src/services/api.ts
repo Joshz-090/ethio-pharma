@@ -18,6 +18,99 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+// Intercept requests to add JWT token
+api.interceptors.request.use((config) => {
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+  return config;
+});
+
+// ---- Auth & Profile ----
+export async function login(username: string, password: string) {
+  const res = await api.post('/token/', { username, password });
+  if (res.data.access) {
+    localStorage.setItem('access_token', res.data.access);
+    localStorage.setItem('refresh_token', res.data.refresh);
+    
+    // Fetch profile to get role
+    try {
+      const profile = await getUserProfile();
+      localStorage.setItem('user_role', profile.role || 'pharmacist');
+      return { ...res.data, role: profile.role || 'pharmacist' };
+    } catch (e) {
+      console.error('Failed to fetch profile', e);
+      localStorage.setItem('user_role', 'pharmacist'); // default fallback
+      return { ...res.data, role: 'pharmacist' };
+    }
+  }
+  return res.data;
+}
+
+export async function getUserProfile() {
+  const res = await api.get('/users/profiles/');
+  // Usually returns an array or single object if filtered by me
+  return Array.isArray(res.data) ? res.data[0] : res.data;
+}
+
+export function logout() {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user_role');
+    window.location.href = '/login';
+  }
+}
+
+export async function registerUser(data: any) {
+  const res = await api.post('/users/register/', data);
+  return res.data;
+}
+
+// ---- AI Endpoints ----
+export async function scanPrescriptionOCR(imageFile: File) {
+  const formData = new FormData();
+  formData.append('image', imageFile);
+  const res = await api.post('/ai/ocr/', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+  return res.data;
+}
+
+export async function getDemandPredictions() {
+  const res = await api.get('/ai/predict/');
+  return res.data;
+}
+
+// ---- Admin Endpoints (Catalog & Pharmacies) ----
+export async function getCatalog() {
+  const res = await api.get('/medicines/catalog/');
+  return res.data;
+}
+
+export async function addCatalogItem(data: any) {
+  const res = await api.post('/medicines/catalog/', data);
+  return res.data;
+}
+
+export async function getPharmacies() {
+  const res = await api.get('/pharmacies/');
+  return res.data;
+}
+
+export async function approvePharmacy(id: string) {
+  const res = await api.patch(`/pharmacies/${id}/`, { verification_status: 'verified' });
+  return res.data;
+}
+
+export async function registerPharmacy(data: any) {
+  const res = await api.post('/pharmacies/', data);
+  return res.data;
+}
+
 // ---- Inventory ----
 export async function getInventory(): Promise<InventoryItem[]> {
   if (USE_MOCK) return Promise.resolve(mockInventory);

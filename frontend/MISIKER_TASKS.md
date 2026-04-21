@@ -1,88 +1,27 @@
-# 🏛️ Misiker's Web Integration Guide (Pharmacist & Admin Portal)
+# 🌐 Web Application Plan: Misiker
 
-This guide provides the technical roadmap for connecting the Next.js web application to the Ethio-Pharma production backend.
+Misiker, you are building the **MedLink Pharmacy & Admin Portal** using Next.js. This is where Pharmacists manage their business and Admins monitor the system.
 
-## 🔗 Connection Info
-- **Production URL**: `https://ethio-pharma.onrender.com/api`
-- **Interactive Documentation**: `https://ethio-pharma.onrender.com/api/docs/`
-- **Format**: All requests must use `Content-Type: application/json`
+## 🚀 Setup Instructions
+1. `cd frontend`
+2. Run `npx create-next-app@latest ./ --typescript --tailwind --eslint`. (Use these options when asked).
+3. `npm install axios framer-motion lucide-react`
+4. `npm run dev`
 
----
+## 🎯 Your Coding Tasks for Today
+1.  **Dashboard Shell**: Build a professional side-navigation layout (using Lucide icons).
+2.  **Inventory Management Page**:
+    *   Table view of the pharmacy's stock.
+    *   "Update Quantity" and "Change Price" buttons.
+3.  **Prescription Approval Flow**:
+    *   A list of pending prescriptions uploaded by patients.
+    *   Functionality to view the image and click "Approve" (Status: Approved) or "Reject" (Status: Rejected).
 
-## 🛠️ Tech Stack Recommendations
-- **Framework**: Next.js 14+ (App Router)
-- **Styling**: Tailwind CSS + ShadcnUI (for professional tables and dialogs)
-- **State Management**: React Query (TanStack Query) - *Best for handling API data fetching/caching*
-- **Icons**: Lucide-React
-- **Charts**: Recharts (for the Analytics Dashboard)
+## 📄 Components to Build
+- `/components/DashboardLayout.tsx`
+- `/app/inventory/page.tsx`
+- `/app/prescriptions/page.tsx`
+- `/services/api.ts` (Point to Eyasu's backend).
 
----
-
-## 🔐 Step 1: User Registration
-Misiker, there are two ways to enter the system:
-
-### A. New Pharmacist Registration
-1.  **Create User**: Use `POST /api/users/register/` with `role: "pharmacist"`.
-2.  **Submit Pharmacy**: Once logged in, use `POST /api/pharmacies/`.
-    - **Logic**: The backend will mark this as `status: "pending"`.
-    - **Linking**: The system will automatically link this pharmacy to the user's profile.
-
-### B. Admin Entry
-- Global Admins are created via the Django Admin panel or by another Admin.
-- Admins see the **"Registration Hall"**—a list of all pharmacies with `status: "pending"`.
-
----
-
-## 🛡️ Section A: The Admin Dashboard (Feature List)
-- [ ] **Pharmacy Registry**: A table showing all registered shops in Arba Minch.
-- [ ] **Approval Workflow**: Clickable "Approve" or "Reject" status toggle.
-- [ ] **Subscription Monitor**: 
-  - Visual color indicators for expiry (Green = Active, Red = Expired).
-  - Manual "Extend Subscription" button for Admins after receiving cash.
-- [ ] **System Suspension**: Instant "OFF" switch to block any pharmacy violating rules.
-
----
-
-- [ ] **Inventory Control (New Product Entry)**:
-  - **Auto-Fill**: Search/Select from the Master Catalog to keep names consistent.
-  - **Medical Details**: Capture `brand` (e.g. Panadol), `strength` (500mg), `route` (PO), `frequency` (BID), and `duration` (10 days).
-  - **Safety**: Capture `expiry_date` (Show red if expired!) and `batch_number`.
-  - **Advice**: Add Custom Advice to the `usage_instructions` field.
-- [ ] **AI Prescription Room**: 
-  - A side-by-side view: **[Original Photo]** | **[Editable AI List]**.
-  - A "Verify & Save" button to finalize the data.
-- [ ] **Live Order Hub**:
-  - List of active reservations coming from Yadesa's mobile app.
-  - "In-Store Pickup" button to mark a medication as sold.
-- [ ] **BI Analytics Tab**:
-  - "Demand Heatmap": Show what drugs are trending in the user's specific sector (Sikela/Secha).
-
----
-
-## 📅 Section C: Subscription Warning Logic (Build this in Frontend)
-Calculate `days_left = (subscription_expiry - today)`.
-| Days Left | UI Behavior |
-| :--- | :--- |
-| 30 Days | Sticky Header: "Subscription expires in 30 days. Contact Admin." |
-| 15 Days | Side Modal Popup on login. |
-| 5 - 1 Days | Glowing Red Banner + Daily Alert. |
-| 0 Days | Block Dashboard: "System Suspended. Please pay your yearly fee." |
-
----
-
-### 💡 API Interceptor Code (Copy-Paste)
-```typescript
-import axios from 'axios';
-
-const api = axios.create({ baseURL: 'https://ethio-pharma.onrender.com/api' });
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
-
-export default api;
-```
-
-**Misiker, your mission is to build a system that manages itself! 🚀**
+## 📡 Deliverable
+A functional web portal shell where a pharmacist can log in and see their specific inventory table.
