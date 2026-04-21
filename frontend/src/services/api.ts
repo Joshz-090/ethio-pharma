@@ -39,21 +39,31 @@ export async function login(username: string, password: string) {
     // Fetch profile to get role
     try {
       const profile = await getUserProfile();
-      localStorage.setItem('user_role', profile.role || 'pharmacist');
-      return { ...res.data, role: profile.role || 'pharmacist' };
+      const role = profile.role || 'pharmacist';
+      localStorage.setItem('user_role', role);
+      return { ...res.data, role };
     } catch (e) {
       console.error('Failed to fetch profile', e);
-      localStorage.setItem('user_role', 'pharmacist'); // default fallback
-      return { ...res.data, role: 'pharmacist' };
+      // Check if user is admin by checking is_staff status
+      try {
+        const userRes = await api.get('/users/profiles/');
+        const userData = Array.isArray(userRes.data) ? userRes.data[0] : userRes.data;
+        const role = userData.role || 'pharmacist';
+        localStorage.setItem('user_role', role);
+        return { ...res.data, role };
+      } catch (e2) {
+        console.error('Failed to get user data', e2);
+        localStorage.setItem('user_role', 'pharmacist');
+        return { ...res.data, role: 'pharmacist' };
+      }
     }
   }
   return res.data;
 }
 
 export async function getUserProfile() {
-  const res = await api.get('/users/profiles/');
-  // Usually returns an array or single object if filtered by me
-  return Array.isArray(res.data) ? res.data[0] : res.data;
+  const res = await api.get('/users/profiles/me/');
+  return res.data;
 }
 
 export function logout() {

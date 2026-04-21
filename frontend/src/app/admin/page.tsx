@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Building2, Users, Activity, BookOpen, Clock, CheckCircle, ShieldCheck, TrendingUp, ChevronRight } from 'lucide-react';
 import { getPharmacies, getCatalog } from '@/services/api';
 import PageHeader from '@/components/ui/PageHeader';
+import AuthGuard from '@/components/AuthGuard';
 
 interface StatCard {
   label: string;
@@ -58,18 +59,32 @@ export default function AdminOverviewPage() {
   ];
 
   return (
-    <div className="space-y-8 pb-12">
-      <PageHeader 
-        title="Administrative Overview"
-        subtitle="Manage the MedLink network, approve registrations, and monitor global medicine catalogs"
-        breadcrumb={['Admin', 'Dashboard']}
-      />
+    <AuthGuard requiredRole="admin">
+      <div className="space-y-8 pb-12">
+        <PageHeader 
+          title="Administrative Overview"
+          subtitle="Manage the MedLink network, approve registrations, and monitor global medicine catalogs"
+          breadcrumb={['Admin', 'Dashboard']}
+        />
 
-      {/* Stat cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-        {isLoading ? (
-          [...Array(4)].map((_, i) => (
-            <div key={i} className="h-40 bg-white rounded-[2rem] border border-slate-100 animate-pulse" />
+        {/* Stat cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+          {isLoading ? (
+            [...Array(4)].map((_, i) => (
+              <div key={i} className="h-40 bg-white rounded-[2rem] border border-slate-100 animate-pulse" />
+            ))
+          ) : (
+            statCards.map((card, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
+                className="p-8 bg-white rounded-[2rem] border border-slate-100 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between">
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm" style={{ background: card.bg, border: `1px solid ${card.border}` }}>
+                    <card.icon size={24} style={{ color: card.color }} />
+                  </div>
+                  <div className="text-right">
+                    <div className="text-3xl font-black text-slate-900 leading-none">{card.value}</div>
+                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Total</div>
+                  </div>
           ))
         ) : (
           statCards.map((card, i) => (
@@ -205,6 +220,6 @@ export default function AdminOverviewPage() {
         </div>
 
       </div>
-    </div>
+    </AuthGuard>
   );
 }
