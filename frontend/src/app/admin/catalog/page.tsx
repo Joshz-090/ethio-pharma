@@ -80,7 +80,7 @@ export default function AdminCatalogPage() {
         breadcrumb={['Admin', 'Catalog']}
         action={
           <button onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-blue-500/20">
+            className="flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-emerald-500/20">
             <Plus size={18} /> Register Medicine
           </button>
         }
@@ -93,17 +93,17 @@ export default function AdminCatalogPage() {
           <Search size={18} className="absolute left-5 top-[52px] text-slate-300 pointer-events-none" />
           <input type="text" value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Search by brand, generic name or category…"
-            className="w-full pl-14 pr-6 py-4 rounded-[1.5rem] text-sm text-slate-900 placeholder-slate-400 outline-none transition-all border-2 border-slate-50 bg-white shadow-sm focus:border-blue-500/30 focus:ring-4 focus:ring-blue-500/5"
+            className="w-full pl-14 pr-6 py-4 rounded-[1.5rem] text-sm text-slate-900 placeholder-slate-400 outline-none transition-all border-2 border-slate-50 bg-white shadow-sm focus:border-emerald-500/30 focus:ring-4 focus:ring-emerald-500/5"
           />
         </div>
         <div className="lg:col-span-4">
-          <div className="bg-blue-50 rounded-[1.5rem] p-4 flex items-center justify-between border border-blue-100">
+          <div className="bg-emerald-50 rounded-[1.5rem] p-4 flex items-center justify-between border border-emerald-100">
             <div>
-              <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Master List Size</p>
-              <p className="text-2xl font-black text-blue-600">{medicines.length}</p>
+              <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Master List Size</p>
+              <p className="text-2xl font-black text-emerald-700">{medicines.length}</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-sm">
-              <Pill size={22} className="text-blue-500" />
+              <Pill size={22} className="text-emerald-500" />
             </div>
           </div>
         </div>
@@ -111,7 +111,7 @@ export default function AdminCatalogPage() {
 
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-32 gap-4">
-          <div className="w-12 h-12 border-4 border-slate-100 border-t-blue-600 rounded-full animate-spin" />
+          <div className="w-12 h-12 border-4 border-slate-100 border-t-emerald-600 rounded-full animate-spin" />
           <p className="text-slate-400 font-black text-sm uppercase tracking-widest">Syncing Catalog…</p>
         </div>
       ) : error ? (
@@ -138,7 +138,7 @@ export default function AdminCatalogPage() {
                     className="group hover:bg-slate-50 transition-colors">
                     <td className="px-8 py-5">
                       <div className="font-black text-slate-900 flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center border border-blue-100 text-blue-600">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center border border-emerald-100 text-emerald-600">
                           <Pill size={14} />
                         </div>
                         {m.name}
@@ -187,28 +187,28 @@ export default function AdminCatalogPage() {
                 <div className="grid grid-cols-2 gap-6">
                   <div>
                     <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Brand Name</label>
-                    <input required value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full px-5 py-3.5 rounded-2xl text-sm text-slate-900 border-2 border-slate-50 bg-slate-50 focus:bg-white focus:border-blue-500/30 outline-none transition-all" placeholder="e.g. Panadol" />
+                    <input required value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full px-5 py-3.5 rounded-2xl text-sm text-slate-900 border-2 border-slate-50 bg-slate-50 focus:bg-white focus:border-emerald-500/30 outline-none transition-all" placeholder="e.g. Panadol" />
                   </div>
                   <div>
                     <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Generic Formulation</label>
-                    <input value={form.generic_name} onChange={e => setForm({...form, generic_name: e.target.value})} className="w-full px-5 py-3.5 rounded-2xl text-sm text-slate-900 border-2 border-slate-50 bg-slate-50 focus:bg-white focus:border-blue-500/30 outline-none transition-all" placeholder="e.g. Paracetamol" />
+                    <input value={form.generic_name} onChange={e => setForm({...form, generic_name: e.target.value})} className="w-full px-5 py-3.5 rounded-2xl text-sm text-slate-900 border-2 border-slate-50 bg-slate-50 focus:bg-white focus:border-emerald-500/30 outline-none transition-all" placeholder="e.g. Paracetamol" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-6">
                   <div>
                     <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Therapeutic Category</label>
-                    <select required value={form.category} onChange={e => setForm({...form, category: e.target.value})} className="w-full px-5 py-3.5 rounded-2xl text-sm text-slate-900 border-2 border-slate-50 bg-slate-50 focus:bg-white focus:border-blue-500/30 outline-none transition-all appearance-none cursor-pointer">
+                    <select required value={form.category} onChange={e => setForm({...form, category: e.target.value})} className="w-full px-5 py-3.5 rounded-2xl text-sm text-slate-900 border-2 border-slate-50 bg-slate-50 focus:bg-white focus:border-emerald-500/30 outline-none transition-all appearance-none cursor-pointer">
                       {CATEGORIES.map(c => <option key={c}>{c}</option>)}
                     </select>
                   </div>
                   <div>
                     <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Manufacturer</label>
-                    <input value={form.manufacturer} onChange={e => setForm({...form, manufacturer: e.target.value})} className="w-full px-5 py-3.5 rounded-2xl text-sm text-slate-900 border-2 border-slate-50 bg-slate-50 focus:bg-white focus:border-blue-500/30 outline-none transition-all" placeholder="e.g. GSK" />
+                    <input value={form.manufacturer} onChange={e => setForm({...form, manufacturer: e.target.value})} className="w-full px-5 py-3.5 rounded-2xl text-sm text-slate-900 border-2 border-slate-50 bg-slate-50 focus:bg-white focus:border-emerald-500/30 outline-none transition-all" placeholder="e.g. GSK" />
                   </div>
                 </div>
                 <div className="flex gap-4 pt-4">
                   <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-4 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-2xl font-black text-sm transition-all">Cancel</button>
-                  <button type="submit" disabled={isSaving} className="flex-[2] py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-sm transition-all shadow-xl shadow-blue-500/20 flex items-center justify-center gap-3">
+                  <button type="submit" disabled={isSaving} className="flex-[2] py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-black text-sm transition-all shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-3">
                     {isSaving ? <span className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin" /> : <Save size={18} />} Save Entry
                   </button>
                 </div>

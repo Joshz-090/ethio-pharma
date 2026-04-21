@@ -29,6 +29,36 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Intercept responses to handle token expiration (401)
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        const refreshToken = localStorage.getItem('refresh_token');
+        if (!refreshToken) throw new Error('No refresh token available');
+
+        // Note: Using raw axios to avoid interceptor loop
+        const res = await axios.post(`${api.defaults.baseURL}/token/refresh/`, {
+          refresh: refreshToken,
+        });
+
+        if (res.data.access) {
+          localStorage.setItem('access_token', res.data.access);
+          originalRequest.headers.Authorization = `Bearer ${res.data.access}`;
+          return api(originalRequest);
+        }
+      } catch (refreshError) {
+        console.error('Token refresh failed', refreshError);
+        logout();
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 // ---- Auth & Profile ----
 export async function login(username: string, password: string) {
   const res = await api.post('/token/', { username, password });
@@ -111,8 +141,13 @@ export async function getPharmacies() {
   return res.data;
 }
 
+export async function getUsers() {
+  const res = await api.get('/users/profiles/');
+  return res.data;
+}
+
 export async function approvePharmacy(id: string) {
-  const res = await api.patch(`/pharmacies/${id}/`, { verification_status: 'verified' });
+  const res = await api.patch(`/pharmacies/${id}/`, { status: 'approved' });
   return res.data;
 }
 
