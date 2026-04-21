@@ -6,11 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Package, Clock, BarChart3, FileText,
   User, Bell, ChevronLeft, ChevronRight, Activity,
-  Pill, LogOut, Settings,
+  Pill, LogOut, Settings, Building2, BookOpen, ShieldCheck, Users as UsersIcon
 } from 'lucide-react';
 import { logout } from '@/services/api';
 
-const navItems = [
+const pharmacistNavItems = [
   { label: 'Overview',      href: '/pharmacist',             icon: LayoutDashboard },
   { label: 'Inventory',     href: '/pharmacist/inventory',   icon: Package },
   { label: 'Reservations',  href: '/pharmacist/reservations',icon: Clock },
@@ -18,10 +18,24 @@ const navItems = [
   { label: 'Prescriptions', href: '/pharmacist/prescriptions',icon: FileText },
 ];
 
-const bottomItems = [
-  { label: 'Profile',  href: '/pharmacist/profile',  icon: User },
-  { label: 'Settings', href: '/pharmacist/settings', icon: Settings },
+const adminNavItems = [
+  { label: 'Overview',      href: '/admin',             icon: LayoutDashboard },
+  { label: 'Pharmacies',    href: '/admin/pharmacies',  icon: Building2 },
+  { label: 'Global Catalog',href: '/admin/catalog',     icon: BookOpen },
+  { label: 'AI Analytics',  href: '/admin/analytics',   icon: Activity },
+  { label: 'User Roles',    href: '/admin/users',       icon: UsersIcon },
 ];
+
+const bottomItems = [
+  { label: 'Profile',  href: '/profile',  icon: User },
+  { label: 'Settings', href: '/settings', icon: Settings },
+];
+
+export interface NavItemType {
+  label: string;
+  href: string;
+  icon: React.ElementType;
+}
 
 interface NavItemProps {
   label: string;
@@ -75,11 +89,29 @@ function NavItem({ label, href, icon: Icon, isActive, collapsed }: NavItemProps)
   );
 }
 
-interface DashboardLayoutProps { children: ReactNode }
+export interface DashboardLayoutProps {
+  children: ReactNode;
+  variant?: 'pharmacist' | 'admin';
+  portalName?: string;
+  portalSubtitle?: string;
+  userName?: string;
+}
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+export default function DashboardLayout({ 
+  children, 
+  variant = 'pharmacist',
+  portalName = 'MedLink', 
+  portalSubtitle = 'Pharmacy Portal',
+  userName = 'MA'
+}: DashboardLayoutProps) {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
+  
+  const navItems = variant === 'admin' ? adminNavItems : pharmacistNavItems;
+  const currentBottomItems = bottomItems.map(item => ({
+    ...item,
+    href: `/${variant}${item.href}`
+  }));
   const sidebarW = collapsed ? 72 : 260;
   const now = new Date();
   const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
@@ -119,10 +151,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               {!collapsed && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                   <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--color-text-primary)', lineHeight: 1 }}>
-                    MedLink
+                    {portalName}
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--color-text-muted)', fontWeight: 500 }}>
-                    Pharmacy Portal
+                    {portalSubtitle}
                   </div>
                 </motion.div>
               )}
@@ -170,7 +202,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
         {/* Bottom nav */}
         <div style={{ padding: '12px 12px', borderTop: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: 4 }}>
-          {bottomItems.map(item => (
+          {currentBottomItems.map(item => (
             <NavItem key={item.href} {...item} isActive={pathname.startsWith(item.href)} collapsed={collapsed} />
           ))}
           <motion.button
@@ -262,14 +294,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               }} />
             </motion.button>
 
-            {/* Avatar */}
             <div style={{
               width: 38, height: 38, borderRadius: 'var(--radius-md)',
               background: 'linear-gradient(135deg, #0ea5e9, #14b8a6)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 14, fontWeight: 700, color: 'white', cursor: 'pointer',
             }}>
-              MA
+              {userName}
             </div>
           </div>
         </header>

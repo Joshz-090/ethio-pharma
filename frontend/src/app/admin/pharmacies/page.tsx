@@ -12,7 +12,7 @@ interface Pharmacy {
   owner_name: string;
   contact_phone: string;
   address: string;
-  verification_status: 'pending' | 'verified' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected';
   payment_receipt?: string;
   created_at: string;
 }
@@ -44,13 +44,13 @@ export default function AdminPharmaciesPage() {
     if (!confirm('Approve this pharmacy and grant dashboard access?')) return;
     try {
       await approvePharmacy(id);
-      setPharmacies(prev => prev.map(p => p.id === id ? { ...p, verification_status: 'verified' } : p));
+      setPharmacies(prev => prev.map(p => p.id === id ? { ...p, status: 'approved' } : p));
     } catch (err) {
       alert('Failed to approve pharmacy.');
     }
   };
 
-  const filtered = pharmacies.filter(p => p.verification_status === filter);
+  const filtered = pharmacies.filter(p => p.status === filter);
 
   return (
     <div className="space-y-8 pb-12">
@@ -62,20 +62,26 @@ export default function AdminPharmaciesPage() {
 
       {/* Tabs */}
       <div className="flex gap-2 p-1.5 bg-white border border-slate-100 rounded-2xl w-fit shadow-sm">
-        {(['pending', 'verified'] as const).map((status) => (
-          <button key={status} onClick={() => setFilter(status)}
-            className={`px-6 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl transition-all flex items-center gap-3 ${
-              filter === status ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-400 hover:text-slate-600'
-            }`}>
-            {status}
-            {status === 'pending' && pharmacies.filter(p => p.verification_status === 'pending').length > 0 && (
-              <span className={`w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-black ${
-                filter === status ? 'bg-white text-blue-600' : 'bg-blue-50 text-blue-600'
-              }`}>
-                {pharmacies.filter(p => p.verification_status === 'pending').length}
-              </span>
-            )}
-          </button>
+        {[
+            { id: 'pending', label: 'Pending Review', icon: Clock },
+            { id: 'approved', label: 'Approved', icon: CheckCircle },
+            { id: 'rejected', label: 'Rejected', icon: XCircle },
+          ].map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => setFilter(id as any)}
+              className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all ${
+                filter === id ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-500 hover:bg-slate-50'
+              }`}
+            >
+              <Icon size={16} />
+              {label}
+              {id === 'pending' && pharmacies.filter(p => p.status === 'pending').length > 0 && (
+                <span className="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-[10px] text-amber-700">
+                  {pharmacies.filter(p => p.status === 'pending').length}
+                </span>
+              )}
+            </button>
         ))}
       </div>
 
@@ -115,7 +121,7 @@ export default function AdminPharmaciesPage() {
                       </div>
                     </div>
                   </div>
-                  {pharmacy.verification_status === 'verified' && (
+                  {pharmacy.status === 'approved' && (
                     <span className="px-4 py-1.5 bg-green-50 text-green-600 text-[10px] font-black rounded-full uppercase tracking-widest border border-green-100 flex items-center gap-2">
                       <ShieldCheck size={14} /> Verified SaaS
                     </span>

@@ -52,8 +52,48 @@ export async function login(username: string, password: string) {
 
 export async function getUserProfile() {
   const res = await api.get('/users/profiles/');
-  // Usually returns an array or single object if filtered by me
-  return Array.isArray(res.data) ? res.data[0] : res.data;
+  // If the backend returns an array (which it does for admins), find the profile belonging to the logged-in user
+  if (Array.isArray(res.data)) {
+    if (res.data.length === 0) return {};
+    if (res.data.length === 1) return res.data[0];
+
+    // Decode token to find current user's ID
+    let userId = null;
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        try {
+          // Fix: Some base64 strings might need padding, though atob usually handles it.
+          // In JWT, the payload is the second part
+          const base64Url = token.split('.')[1];
+          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+          const payload = JSON.parse(decodeURIComponent(window.atob(base64).split('').map(function(c) {
+              return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+          }).join('')));
+          
+          userId = payload.user_id;
+          
+          // p.user is an object from the nested UserSerializer, so check p.user.id
+          const myProfile = res.data.find((p: any) => p.user?.id === userId || p.user === userId);
+          if (myProfile) return myProfile;
+        } catch (e) {
+          console.error('Error decoding token', e);
+        }
+      }
+    }
+    
+    // Fallback: If the backend returned multiple profiles (meaning we bypassed the user filter)
+    // AND we didn't find our own profile, it mathematically proves this is a superuser (is_staff) 
+    // without a UserProfile database entry. We should explicitly return an admin object.
+    if (res.data.length > 1) {
+      return { role: 'admin' };
+    }
+
+    // Absolute fallback
+    return res.data[0] || {};
+  }
+  
+  return res.data;
 }
 
 export function logout() {
@@ -102,7 +142,7 @@ export async function getPharmacies() {
 }
 
 export async function approvePharmacy(id: string) {
-  const res = await api.patch(`/pharmacies/${id}/`, { verification_status: 'verified' });
+  const res = await api.patch(`/pharmacies/${id}/`, { status: 'approved' });
   return res.data;
 }
 

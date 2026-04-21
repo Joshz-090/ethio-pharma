@@ -36,8 +36,8 @@ export default function AdminOverviewPage() {
       const catList = catalog.status === 'fulfilled' ? catalog.value : [];
 
       setStats({
-        pharmacies: phList.filter((p: any) => p.verification_status === 'verified').length,
-        pending:    phList.filter((p: any) => p.verification_status === 'pending').length,
+        pharmacies: phList.filter((p: any) => p.status === 'approved').length,
+        pending:    phList.filter((p: any) => p.status === 'pending').length,
         catalog:    catList.length,
         users:      phList.length,
       });
@@ -134,11 +134,11 @@ export default function AdminOverviewPage() {
                     </td>
                     <td className="px-8 py-5 text-center">
                       <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                        p.verification_status === 'verified' ? 'bg-green-50 text-green-600 border border-green-100' :
-                        p.verification_status === 'pending' ? 'bg-amber-50 text-amber-600 border border-amber-100' :
+                        p.status === 'approved' ? 'bg-green-50 text-green-600 border border-green-100' :
+                        p.status === 'pending' ? 'bg-amber-50 text-amber-600 border border-amber-100' :
                         'bg-red-50 text-red-600 border border-red-100'
                       }`}>
-                        {p.verification_status}
+                        {p.status}
                       </span>
                     </td>
                     <td className="px-8 py-5 text-right">
@@ -155,23 +155,23 @@ export default function AdminOverviewPage() {
 
         {/* Quick Actions Sidebar */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="bg-slate-900 rounded-[2.5rem] p-10 text-white shadow-xl shadow-slate-900/10">
-            <h4 className="text-xl font-black mb-6">Quick Controls</h4>
+          <div className="bg-blue-50 rounded-[2.5rem] p-10 border border-blue-100 shadow-sm">
+            <h4 className="text-xl font-black mb-6 text-slate-900">Quick Controls</h4>
             <div className="space-y-4">
               {[
-                { href: '/admin/pharmacies', icon: Building2, color: 'text-blue-400', title: 'Applications', desc: `${stats.pending} waiting` },
-                { href: '/admin/catalog',    icon: BookOpen,  color: 'text-green-400', title: 'Medicine Catalog', desc: 'Manage list' },
-                { href: '/admin/analytics',  icon: TrendingUp,color: 'text-purple-400', title: 'AI Predictions', desc: 'Market demand' },
+                { href: '/admin/pharmacies', icon: Building2, color: 'text-blue-600', bg: 'bg-blue-100', title: 'Applications', desc: `${stats.pending} waiting` },
+                { href: '/admin/catalog',    icon: BookOpen,  color: 'text-green-600', bg: 'bg-green-100', title: 'Medicine Catalog', desc: 'Manage list' },
+                { href: '/admin/analytics',  icon: TrendingUp,color: 'text-purple-600', bg: 'bg-purple-100', title: 'AI Predictions', desc: 'Market demand' },
               ].map((action, i) => (
-                <a key={i} href={action.href} className="flex items-center gap-4 p-4 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all group">
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-white/5 group-hover:scale-110 transition-transform">
+                <a key={i} href={action.href} className="flex items-center gap-4 p-4 rounded-3xl bg-white border border-white hover:border-blue-200 hover:shadow-md transition-all group">
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${action.bg} group-hover:scale-110 transition-transform`}>
                     <action.icon size={20} className={action.color} />
                   </div>
                   <div>
-                    <div className="font-black text-sm">{action.title}</div>
-                    <div className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-0.5">{action.desc}</div>
+                    <div className="font-black text-sm text-slate-900">{action.title}</div>
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{action.desc}</div>
                   </div>
-                  <ChevronRight size={16} className="ml-auto opacity-20 group-hover:opacity-100 transition-opacity" />
+                  <ChevronRight size={16} className="ml-auto opacity-20 group-hover:opacity-100 text-blue-600 transition-opacity" />
                 </a>
               ))}
             </div>
