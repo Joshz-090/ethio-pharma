@@ -43,19 +43,19 @@ class InventoryViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        qs = Inventory.objects.all()
+        qs = Inventory.objects.all().select_related('medicine', 'pharmacy')
         
-        # Admin can see all inventory
-        if IsAdmin().has_permission(self.request, self):
+        # Check role safely
+        role = getattr(user.profile, 'role', None) if hasattr(user, 'profile') else None
+
+        if role == 'admin':
             return qs
             
-        # Pharmacists only see their pharmacy's inventory
-        if IsPharmacist().has_permission(self.request, self):
+        if role == 'pharmacist':
             if user.profile.pharmacy:
                 return qs.filter(pharmacy=user.profile.pharmacy)
             return qs.none()
             
-        # Patients see all inventory from active/approved pharmacies
         return qs.filter(pharmacy__is_active=True, quantity__gt=0)
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.AllowAny])
