@@ -27,7 +27,21 @@ export default function AdminCatalogPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [form, setForm] = useState({ name: '', generic_name: '', category: 'Painkiller', manufacturer: '', description: '' });
 
-  useEffect(() => { fetchData(); }, []);
+  const [categories, setCategories] = useState<{id: string, name: string}[]>([]);
+
+  useEffect(() => { 
+    fetchData(); 
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const res = await api.get('/medicines/categories/');
+      setCategories(res.data);
+    } catch (err) {
+      console.error('Failed to fetch categories:', err);
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -198,13 +212,18 @@ export default function AdminCatalogPage() {
                   <div>
                     <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Therapeutic Category</label>
                     <select required value={form.category} onChange={e => setForm({...form, category: e.target.value})} className="w-full px-5 py-3.5 rounded-2xl text-sm text-slate-900 border-2 border-slate-50 bg-slate-50 focus:bg-white focus:border-emerald-500/30 outline-none transition-all appearance-none cursor-pointer">
-                      {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                      <option value="">Select a category</option>
+                      {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                   </div>
                   <div>
                     <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Manufacturer</label>
                     <input value={form.manufacturer} onChange={e => setForm({...form, manufacturer: e.target.value})} className="w-full px-5 py-3.5 rounded-2xl text-sm text-slate-900 border-2 border-slate-50 bg-slate-50 focus:bg-white focus:border-emerald-500/30 outline-none transition-all" placeholder="e.g. GSK" />
                   </div>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Image URL (Optional)</label>
+                  <input value={(form as any).image_url || ''} onChange={e => setForm({...form, image_url: e.target.value})} className="w-full px-5 py-3.5 rounded-2xl text-sm text-slate-900 border-2 border-slate-50 bg-slate-50 focus:bg-white focus:border-emerald-500/30 outline-none transition-all" placeholder="https://api.ethio-pharma.com/images/med.jpg" />
                 </div>
                 <div className="flex gap-4 pt-4">
                   <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-4 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-2xl font-black text-sm transition-all">Cancel</button>

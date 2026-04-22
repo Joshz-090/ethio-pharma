@@ -30,7 +30,14 @@ export default function LoginPage() {
       const auth = await login(username, password);
       router.push(auth.role === 'admin' ? '/admin' : '/pharmacist');
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Invalid username or password. Please try again.');
+      const detail = err.response?.data?.detail || '';
+      const code = err.response?.data?.code || '';
+      
+      if (code === 'account_pending') {
+        router.push('/pending-approval');
+      } else {
+        setError(detail || 'Invalid username or password. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

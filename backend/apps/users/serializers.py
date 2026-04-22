@@ -20,6 +20,7 @@ class RegisterSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
     role = serializers.ChoiceField(choices=UserProfile.ROLE_CHOICES, default='patient')
     phone_number = serializers.CharField(max_length=20, required=False)
+    pharmacy_id = serializers.UUIDField(required=False)
 
     def validate_username(self, value):
         if User.objects.filter(username=value).exists():
@@ -29,6 +30,7 @@ class RegisterSerializer(serializers.Serializer):
     def create(self, validated_data):
         role = validated_data.pop('role', 'patient')
         phone_number = validated_data.pop('phone_number', '')
+        pharmacy_id = validated_data.pop('pharmacy_id', None)
         
         user = User.objects.create(
             username=validated_data['username'],
@@ -39,7 +41,8 @@ class RegisterSerializer(serializers.Serializer):
         UserProfile.objects.create(
             user=user,
             role=role,
-            phone_number=phone_number
+            phone_number=phone_number,
+            pharmacy_id=pharmacy_id
         )
         
         return user

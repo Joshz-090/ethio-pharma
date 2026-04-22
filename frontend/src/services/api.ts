@@ -34,13 +34,16 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    
+    // Skip refresh logic for login and register endpoints to avoid loops
+    const isAuthRequest = originalRequest.url?.includes('/token/') || originalRequest.url?.includes('/users/register/');
+    
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthRequest) {
       originalRequest._retry = true;
       try {
         const refreshToken = localStorage.getItem('refresh_token');
-        if (!refreshToken) throw new Error('No refresh token available');
+        if (!refreshToken) return Promise.reject(error); // No token, just fail
 
-        // Note: Using raw axios to avoid interceptor loop
         const res = await axios.post(`${api.defaults.baseURL}/token/refresh/`, {
           refresh: refreshToken,
         });
@@ -51,7 +54,6 @@ api.interceptors.response.use(
           return api(originalRequest);
         }
       } catch (refreshError) {
-        console.error('Token refresh failed', refreshError);
         logout();
       }
     }
@@ -146,21 +148,50 @@ export async function getUsers() {
   return res.data;
 }
 
+export async function deleteUser(id: string) {
+  const res = await api.delete(`/users/profiles/${id}/`);
+  return res.data;
+}
+
+export async function applyPharmacy(data: any) {
+  // Use raw axios to call the local Next.js API route (same origin)
+  // rather than the Django backend baseURL
+  const res = await axios.post('/api/pharmacy/register', data);
+  return res.data;
+}
+
 export async function approvePharmacy(id: string) {
-  const res = await api.patch(`/pharmacies/${id}/`, { status: 'approved' });
+  const res = await api.post(`/pharmacies/${id}/approve/`);
   return res.data;
 }
 
 export async function registerPharmacy(data: any) {
-  const res = await api.post('/pharmacies/', data);
+  const isFormData = data instanceof FormData;
+  const res = await api.post('/pharmacies/', data, {
+    headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : {}
+  });
   return res.data;
 }
 
 // ---- Inventory ----
 export async function getInventory(): Promise<InventoryItem[]> {
   if (USE_MOCK) return Promise.resolve(mockInventory);
-  const res = await api.get('/inventory/');
-  return res.data;
+  const res = await api.get('/medicines/inventory/');
+  
+  // Map backend fields to frontend InventoryItem format
+  return (res.data || []).map((item: any) => ({
+    id: item.id,
+    medicineName: item.medicine?.name || 'Unknown',
+    genericName: item.brand || 'N/A',
+    batchNumber: item.batch_number || 'N/A',
+    category: item.medicine?.category?.name || 'General',
+    dosageForm: item.route || 'Oral',
+    quantityOnHand: Number(item.quantity) || 0,
+    unitPrice: Number(item.price) || 0,
+    expiryDate: item.expiry_date || 'N/A',
+    status: item.quantity > 10 ? 'in_stock' : item.quantity > 0 ? 'low_stock' : 'out_of_stock',
+    isAvailable: item.quantity > 0
+  }));
 }
 
 export async function updateStock(id: string, quantity: number, price: number): Promise<InventoryItem> {
@@ -169,7 +200,13 @@ export async function updateStock(id: string, quantity: number, price: number): 
     if (item) { item.quantityOnHand = quantity; item.unitPrice = price; }
     return Promise.resolve(item!);
   }
-  const res = await api.patch(`/inventory/${id}/`, { quantity_on_hand: quantity, unit_price: price });
+  const res = await api.patch(`/medicines/inventory/${id}/`, { quantity: quantity, price: price });
+  return res.data;
+}
+
+export async function sellStock(id: string, quantity: number = 1): Promise<any> {
+  if (USE_MOCK) return Promise.resolve();
+  const res = await api.post(`/medicines/inventory/${id}/sell/`, { quantity });
   return res.data;
 }
 
@@ -179,7 +216,7 @@ export async function toggleAvailability(id: string, isAvailable: boolean): Prom
     if (item) item.isAvailable = isAvailable;
     return Promise.resolve(item!);
   }
-  const res = await api.patch(`/inventory/${id}/`, { is_available: isAvailable });
+  const res = await api.patch(`/medicines/inventory/${id}/`, { is_available: isAvailable });
   return res.data;
 }
 

@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronUp, ChevronDown, Edit2, ToggleLeft, ToggleRight } from 'lucide-react';
+import { ChevronUp, ChevronDown, Edit2, ToggleLeft, ToggleRight, Plus, Minus } from 'lucide-react';
 import StatusBadge from '@/components/ui/StatusBadge';
 import { InventoryItem } from '@/lib/mockData';
 
@@ -12,9 +12,11 @@ interface InventoryTableProps {
   items: InventoryItem[];
   onEdit: (item: InventoryItem) => void;
   onToggle: (item: InventoryItem) => void;
+  onSell: (item: InventoryItem) => void;
+  onAddQty: (item: InventoryItem) => void;
 }
 
-const COL_WIDTHS = ['auto', '110px', '90px', '80px', '90px', '110px', '100px', '130px'];
+const COL_WIDTHS = ['auto', '110px', '90px', '130px', '100px', '110px', '100px', '130px'];
 const HEADERS: { label: string; key?: SortKey }[] = [
   { label: 'Medicine',    key: 'medicineName' },
   { label: 'Category',   key: 'category' },
@@ -26,7 +28,7 @@ const HEADERS: { label: string; key?: SortKey }[] = [
   { label: 'Actions' },
 ];
 
-export default function InventoryTable({ items, onEdit, onToggle }: InventoryTableProps) {
+export default function InventoryTable({ items, onEdit, onToggle, onSell, onAddQty }: InventoryTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>('medicineName');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
 
@@ -100,22 +102,58 @@ export default function InventoryTable({ items, onEdit, onToggle }: InventoryTab
                 <td style={{ padding: '13px 14px', fontSize: 13, color: 'var(--color-text-secondary)' }}>
                   {item.dosageForm}
                 </td>
+
+                {/* Quantity Cell with +/- buttons */}
                 <td style={{ padding: '13px 14px' }}>
-                  <span style={{
-                    fontSize: 14, fontWeight: 700,
-                    color: item.quantityOnHand === 0 ? '#ef4444' : item.quantityOnHand < 10 ? '#f59e0b' : 'var(--color-text-primary)',
-                  }}>
-                    {item.quantityOnHand}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <motion.button
+                      whileHover={{ scale: 1.15 }} whileTap={{ scale: 0.9 }}
+                      onClick={() => onSell(item)}
+                      disabled={item.quantityOnHand <= 0}
+                      title="Sell 1 unit"
+                      style={{
+                        width: 26, height: 26, borderRadius: 6,
+                        border: '1px solid rgba(239,68,68,0.4)',
+                        background: item.quantityOnHand > 0 ? 'rgba(239,68,68,0.1)' : 'rgba(200,200,200,0.05)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: item.quantityOnHand > 0 ? 'pointer' : 'not-allowed',
+                        color: item.quantityOnHand > 0 ? '#ef4444' : '#6b7280',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Minus size={12} />
+                    </motion.button>
+                    <span style={{
+                      fontSize: 14, fontWeight: 700, minWidth: 28, textAlign: 'center',
+                      color: item.quantityOnHand === 0 ? '#ef4444' : item.quantityOnHand < 10 ? '#f59e0b' : 'var(--color-text-primary)',
+                    }}>
+                      {item.quantityOnHand}
+                    </span>
+                    <motion.button
+                      whileHover={{ scale: 1.15 }} whileTap={{ scale: 0.9 }}
+                      onClick={() => onAddQty(item)}
+                      title="Add 1 unit"
+                      style={{
+                        width: 26, height: 26, borderRadius: 6,
+                        border: '1px solid rgba(34,197,94,0.4)',
+                        background: 'rgba(34,197,94,0.1)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer', color: '#22c55e', flexShrink: 0,
+                      }}
+                    >
+                      <Plus size={12} />
+                    </motion.button>
+                  </div>
                 </td>
+
                 <td style={{ padding: '13px 14px', fontSize: 14, fontWeight: 600, color: 'var(--color-text-primary)' }}>
-                  {item.unitPrice.toFixed(2)}
+                  {(item.unitPrice || 0).toFixed(2)}
                 </td>
                 <td style={{ padding: '13px 14px', fontSize: 13, color: 'var(--color-text-secondary)' }}>
                   {item.expiryDate}
                 </td>
                 <td style={{ padding: '13px 14px' }}>
-                  <StatusBadge status={item.status} size="sm" />
+                  <StatusBadge status={item.status as any} size="sm" />
                 </td>
                 <td style={{ padding: '13px 14px' }}>
                   <div style={{ display: 'flex', gap: 6 }}>

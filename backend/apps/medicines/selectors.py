@@ -22,7 +22,7 @@ def search_medicines_by_sector(query: str, sector: str = None, user_lat: float =
         )
         
     if sector and sector != 'All':
-        queryset = queryset.filter(pharmacy__sector=sector)
+        queryset = queryset.filter(pharmacy__location__sector=sector)
         
     results = list(queryset)
 

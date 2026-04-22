@@ -5,8 +5,9 @@ import { Search, Filter, Plus } from 'lucide-react';
 import PageHeader from '@/components/ui/PageHeader';
 import InventoryTable from '@/components/inventory/InventoryTable';
 import EditStockModal from '@/components/inventory/EditStockModal';
+import AddStockModal from '@/components/inventory/AddStockModal';
 import { InventoryItem, InventoryStatus } from '@/lib/mockData';
-import { getInventory, updateStock, toggleAvailability } from '@/services/api';
+import { getInventory, updateStock, toggleAvailability, sellStock } from '@/services/api';
 
 const CATEGORIES = ['All', 'Painkiller', 'Antibiotic', 'Diabetes', 'Antimalarial', 'Gastric', 'Vitamin', 'Respiratory', 'Hydration'];
 const STATUSES: { label: string; value: InventoryStatus | 'all' }[] = [
@@ -28,6 +29,7 @@ export default function InventoryPage() {
   const [page, setPage] = useState(1);
   const [editItem, setEditItem] = useState<InventoryItem | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -37,18 +39,7 @@ export default function InventoryPage() {
     try {
       setIsLoading(true);
       const data = await getInventory();
-      // Map backend schema to frontend component schema
-      const mapped = data.map((d: any) => ({
-        id: d.id,
-        medicineName: d.medicine?.name || 'Unknown',
-        genericName: d.medicine?.generic_name || '',
-        category: d.medicine?.category || 'Other',
-        quantityOnHand: d.quantity_on_hand,
-        unitPrice: d.unit_price,
-        isAvailable: d.is_available,
-        status: d.quantity_on_hand === 0 ? 'out_of_stock' : d.quantity_on_hand < 10 ? 'low_stock' : 'in_stock'
-      }));
-      setItems(mapped);
+      setItems(data);
     } catch (err) {
       console.error('Failed to load inventory', err);
     } finally {
@@ -79,6 +70,36 @@ export default function InventoryPage() {
     setItems(prev => prev.map(i => i.id === item.id ? { ...i, isAvailable: !i.isAvailable } : i));
   };
 
+  const handleSell = async (item: InventoryItem) => {
+    if (item.quantityOnHand <= 0) return;
+    try {
+      await sellStock(item.id, 1);
+      setItems(prev => prev.map(i => i.id === item.id ? {
+        ...i,
+        quantityOnHand: i.quantityOnHand - 1,
+        status: (i.quantityOnHand - 1) === 0 ? 'out_of_stock' : (i.quantityOnHand - 1) < 10 ? 'low_stock' : 'in_stock',
+        isAvailable: (i.quantityOnHand - 1) > 0
+      } : i));
+    } catch (err: any) {
+      alert(err.response?.data?.detail || 'Failed to record sale.');
+    }
+  };
+
+  const handleAddQty = async (item: InventoryItem) => {
+    try {
+      const newQty = item.quantityOnHand + 1;
+      await updateStock(item.id, newQty, item.unitPrice);
+      setItems(prev => prev.map(i => i.id === item.id ? {
+        ...i,
+        quantityOnHand: newQty,
+        status: newQty > 10 ? 'in_stock' : 'low_stock',
+        isAvailable: true
+      } : i));
+    } catch (err) {
+      console.error('Failed to add qty', err);
+    }
+  };
+
   const chipStyle = (active: boolean, color = '#0ea5e9') => ({
     padding: '6px 14px', borderRadius: 99,
     background: active ? `rgba(${color === '#0ea5e9' ? '14,165,233' : '14,165,233'},0.15)` : 'transparent',
@@ -97,6 +118,7 @@ export default function InventoryPage() {
         action={
           <motion.button
             whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+            onClick={() => setAddModalOpen(true)}
             style={{
               display: 'flex', alignItems: 'center', gap: 8,
               padding: '10px 18px', borderRadius: 'var(--radius-md)',
@@ -170,7 +192,7 @@ export default function InventoryPage() {
             <span className="w-8 h-8 border-4 border-slate-600 border-t-teal-500 rounded-full animate-spin" />
           </div>
         ) : (
-          <InventoryTable items={paginated} onEdit={handleEdit} onToggle={handleToggle} />
+          <InventoryTable items={paginated} onEdit={handleEdit} onToggle={handleToggle} onSell={handleSell} onAddQty={handleAddQty} />
         )}
 
         {/* Pagination */}
@@ -204,6 +226,14 @@ export default function InventoryPage() {
         open={modalOpen}
         onClose={() => { setModalOpen(false); setEditItem(null); }}
         onSave={handleSave}
+      />
+
+      <AddStockModal
+        open={addModalOpen}
+        onClose={() => setAddModalOpen(false)}
+        onSuccess={(newItem) => {
+          fetchData(); // Refresh the list from the server
+        }}
       />
     </div>
   );

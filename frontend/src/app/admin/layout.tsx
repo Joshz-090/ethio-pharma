@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Users, Activity,
-  LogOut, Settings, Building2, BookOpen, ShieldCheck,
+  LogOut, Settings, Building2, BookOpen, ShieldCheck, TrendingUp,
 } from 'lucide-react';
 import { logout } from '@/services/api';
 
@@ -14,6 +14,7 @@ const navItems = [
   { label: 'Pharmacies',    href: '/admin/pharmacies',  icon: Building2 },
   { label: 'Global Catalog',href: '/admin/catalog',     icon: BookOpen },
   { label: 'AI Analytics',  href: '/admin/analytics',   icon: Activity },
+  { label: 'Sales Report',  href: '/admin/sales',       icon: TrendingUp },
   { label: 'User Roles',    href: '/admin/users',       icon: Users },
 ];
 
