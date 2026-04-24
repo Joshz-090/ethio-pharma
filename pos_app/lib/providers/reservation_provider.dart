@@ -23,8 +23,8 @@ class ReservationNotifier extends AsyncNotifier<List<Reservation>> {
     state = await AsyncValue.guard(() => _fetchAndMerge());
   }
 
-  Future<bool> reserveForOneHour(String medicineId, int quantity) async {
-    final result = await ApiService().createReservation(medicineId, quantity);
+  Future<bool> reserveForOneHour(String medicineId, int quantity, {String? pharmacyId}) async {
+    final result = await ApiService().createReservation(medicineId, quantity, pharmacyId: pharmacyId);
     
     if (result != null) {
       // If server returned a mocked ID (demo_res_...), save it locally for this session

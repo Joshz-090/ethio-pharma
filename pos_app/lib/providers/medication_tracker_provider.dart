@@ -1,66 +1,119 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/tracked_medication.dart';
 import '../services/notification_service.dart';
 
 class MedicationTrackerNotifier extends StateNotifier<List<TrackedMedication>> {
-  MedicationTrackerNotifier() : super(_mockMedications) {
-    _scheduleAll();
+  static const String _storageKey = 'medication_schedule_v2';
+
+  MedicationTrackerNotifier() : super([]) {
+    _loadFromStorage();
+    _listenToNotifications();
   }
 
-  static final List<TrackedMedication> _mockMedications = [
-    TrackedMedication(
-      id: '1',
-      name: 'Amoxicillin',
-      dosage: '500mg - 1 Tablet',
-      scheduleTime: const TimeOfDay(hour: 8, minute: 0),
-      instructions: 'Take after breakfast',
-      isTakenToday: true,
-    ),
-    TrackedMedication(
-      id: '2',
-      name: 'Paracetamol',
-      dosage: '1000mg - 2 Tablets',
-      scheduleTime: const TimeOfDay(hour: 14, minute: 30),
-      instructions: 'Take with plenty of water',
-      isTakenToday: false,
-    ),
-    TrackedMedication(
-      id: '3',
-      name: 'Metformin',
-      dosage: '850mg - 1 Tablet',
-      scheduleTime: const TimeOfDay(hour: 20, minute: 0),
-      instructions: 'Take with evening meal',
-      isTakenToday: false,
-    ),
-  ];
+  void _listenToNotifications() {
+    NotificationService().onNotificationResponse.listen((response) {
+      if (response.actionId == 'take_now' && response.payload != null) {
+        takeMedication(response.payload!);
+      }
+    });
+  }
 
-  Future<void> _scheduleAll() async {
+  Future<void> _loadFromStorage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getString(_storageKey);
+    if (data != null) {
+      final List<dynamic> decoded = jsonDecode(data);
+      state = decoded.map((item) => TrackedMedication.fromJson(item)).toList();
+    }
+    
+    // Check if app was launched from a "Take Now" notification action
+    final launchDetails = await NotificationService().getAppLaunchDetails();
+    if (launchDetails?.notificationResponse?.actionId == 'take_now') {
+      final payload = launchDetails!.notificationResponse!.payload;
+      if (payload != null) {
+        takeMedication(payload);
+      }
+    }
+
+    _cleanAndSchedule();
+  }
+
+  Future<void> _saveToStorage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final data = jsonEncode(state.map((m) => m.toJson()).toList());
+    await prefs.setString(_storageKey, data);
+  }
+
+  Future<void> _cleanAndSchedule() async {
+    // Remove completed ones if needed, but let's keep them for history for now
+    // Schedule notifications for all upcoming meds
+    await NotificationService().cancelAll();
+    
     for (final med in state) {
-      await NotificationService().scheduleMedicationReminder(
-        id: int.parse(med.id),
-        title: 'Time for your ${med.name}',
-        body: 'Dosage: ${med.dosage}. ${med.instructions}',
-        scheduledTime: med.scheduleTime,
-      );
+      if (!med.isCompleted && med.tabletsRemaining > 0) {
+        final notificationId = med.id.hashCode.abs() % 100000;
+        await NotificationService().scheduleMedicationReminder(
+          id: notificationId,
+          title: '💊 Time for your ${med.name}',
+          body: 'Take 1 tablet. (${med.tabletsRemaining} remaining)',
+          scheduledTime: med.nextScheduledTime,
+          payload: med.id,
+        );
+      }
     }
   }
 
-  void toggleTaken(String id) {
+  Future<void> addMedication({
+    required String name,
+    required int totalTablets,
+    required int frequencyHours,
+    required DateTime firstDose,
+  }) async {
+    final newMed = TrackedMedication(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      name: name,
+      totalTablets: totalTablets,
+      tabletsRemaining: totalTablets,
+      frequencyHours: frequencyHours,
+      nextScheduledTime: firstDose,
+    );
+
+    state = [...state, newMed];
+    await _saveToStorage();
+    await _cleanAndSchedule();
+  }
+
+  Future<void> takeMedication(String id) async {
     state = [
       for (final med in state)
-        if (med.id == id) med.copyWith(isTakenToday: !med.isTakenToday) else med,
+        if (med.id == id && !med.isCompleted)
+          _processDose(med)
+        else
+          med,
     ];
+    await _saveToStorage();
+    await _cleanAndSchedule();
   }
 
-  void addMedication(TrackedMedication med) {
-    state = [...state, med];
-    _scheduleAll();
+  TrackedMedication _processDose(TrackedMedication med) {
+    final remaining = med.tabletsRemaining - 1;
+    final isDone = remaining <= 0;
+    
+    return med.copyWith(
+      tabletsRemaining: remaining,
+      lastTakenTime: DateTime.now(),
+      nextScheduledTime: DateTime.now().add(Duration(hours: med.frequencyHours)),
+      isCompleted: isDone,
+    );
   }
 
-  void removeMedication(String id) {
+  Future<void> removeMedication(String id) async {
     state = state.where((m) => m.id != id).toList();
-    NotificationService().cancelAll().then((_) => _scheduleAll());
+    await _saveToStorage();
+    await _cleanAndSchedule();
   }
 }
 

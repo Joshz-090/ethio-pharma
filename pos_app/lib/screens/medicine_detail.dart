@@ -1,13 +1,13 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+
 import '../models/medicine.dart';
-import '../models/tracked_medication.dart';
-import '../providers/medication_tracker_provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/reservation_provider.dart';
+import '../providers/medicine_search_provider.dart';
 import '../services/api_service.dart';
 import 'login_screen.dart';
 import '../providers/language_provider.dart';
@@ -50,7 +50,6 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    // Subtle background pattern
                     Opacity(
                       opacity: 0.1,
                       child: Transform.scale(
@@ -58,7 +57,6 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
                         child: const Icon(Icons.medication_liquid_rounded, size: 300, color: Color(0xFF34C759)),
                       ),
                     ),
-                    // Main Medicine Image (Simulated with Icon for now as per image style)
                     Transform.rotate(
                       angle: -0.1,
                       child: Container(
@@ -68,7 +66,7 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
                           borderRadius: BorderRadius.circular(40),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
+                              color: Colors.black.withOpacity(0.1),
                               blurRadius: 30,
                               offset: const Offset(0, 20),
                             ),
@@ -103,7 +101,6 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
             ),
           ),
 
-          // 2. Custom AppBar
           Positioned(
             top: 50,
             left: 20,
@@ -118,7 +115,6 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
             ),
           ),
 
-          // 3. Frosted Details Card
           Positioned(
             bottom: 0,
             left: 0,
@@ -131,9 +127,9 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
                 child: Container(
                   padding: const EdgeInsets.fromLTRB(30, 40, 30, 30),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: Colors.white.withOpacity(0.7),
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(40)),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.5), width: 1.5),
+                    border: Border.all(color: Colors.white.withOpacity(0.5), width: 1.5),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,7 +152,15 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'High Blood Pressure', // Category/Subtitle
+                                  () {
+                                    final parts = <String>[
+                                      if (widget.medicine.brand?.isNotEmpty == true) widget.medicine.brand!,
+                                      if (widget.medicine.strength?.isNotEmpty == true) widget.medicine.strength!,
+                                    ];
+                                    if (parts.isNotEmpty) return parts.join(' · ');
+                                    if (widget.medicine.category?.isNotEmpty == true) return widget.medicine.category!;
+                                    return widget.medicine.pharmacyName;
+                                  }(),
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: Colors.grey[600],
@@ -166,11 +170,10 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
                               ],
                             ),
                           ),
-                          // Quantity Selector
                           Container(
                             padding: const EdgeInsets.all(2),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.5),
+                              color: Colors.white.withOpacity(0.5),
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: Row(
@@ -189,8 +192,6 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      
-                      // Tabs
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
@@ -203,8 +204,6 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      
-                      // Tab Content
                       Expanded(
                         child: AnimatedSwitcher(
                           duration: const Duration(milliseconds: 300),
@@ -215,10 +214,7 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
                               : _InstructionsBody(medicine: widget.medicine),
                         ),
                       ),
-
                       const SizedBox(height: 20),
-
-                      // Bottom Pricing Bar
                       Padding(
                         padding: const EdgeInsets.only(top: 12),
                         child: Row(
@@ -229,7 +225,7 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
                                 Text('total_cost'.tr(context), style: TextStyle(color: Colors.grey[600], fontSize: 11)),
                                 const SizedBox(height: 2),
                                 Text(
-                                  NumberFormat.currency(symbol: '\$').format((widget.medicine.price / 4) * _quantity),
+                                  '${(widget.medicine.price * _quantity).toStringAsFixed(0)} ETB',
                                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFF13231A)),
                                 ),
                               ],
@@ -250,7 +246,11 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
                                     SnackBar(content: Text('processing'.tr(context)), duration: const Duration(seconds: 1)),
                                   );
 
-                                  final success = await ref.read(reservationProvider.notifier).reserveForOneHour(widget.medicine.id, _quantity);
+                                  final success = await ref.read(reservationProvider.notifier).reserveForOneHour(
+                                    widget.medicine.id, 
+                                    _quantity,
+                                    pharmacyId: widget.medicine.pharmacyId,
+                                  );
 
                                   if (!mounted) return;
 
@@ -321,9 +321,9 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.3),
+              color: Colors.white.withOpacity(0.3),
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+              border: Border.all(color: Colors.white.withOpacity(0.3)),
             ),
             child: Icon(icon, size: 20, color: const Color(0xFF13231A)),
           ),
@@ -350,7 +350,7 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white.withValues(alpha: 0.5) : Colors.transparent,
+          color: isSelected ? Colors.white.withOpacity(0.5) : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
@@ -364,6 +364,86 @@ class _MedicineDetailScreenState extends ConsumerState<MedicineDetailScreen> {
       ),
     );
   }
+
+  static void _showReviewDialog(BuildContext context, WidgetRef ref, Medicine medicine) {
+    if (!ref.read(authProvider).isAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please login to write a review')),
+      );
+      return;
+    }
+
+    int selectedRating = 5;
+    final commentController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          title: const Text('Write a Review', style: TextStyle(fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(5, (index) => IconButton(
+                  onPressed: () => setDialogState(() => selectedRating = index + 1),
+                  icon: Icon(
+                    index < selectedRating ? Icons.star_rounded : Icons.star_outline_rounded,
+                    color: Colors.amber,
+                    size: 32,
+                  ),
+                )),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: commentController,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: 'Share your experience...',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                  filled: true,
+                  fillColor: Colors.grey[50]
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            ElevatedButton(
+              onPressed: () async {
+                final success = await ApiService().addReview(
+                  medicineId: medicine.medicineModelId,
+                  pharmacyId: medicine.pharmacyId,
+                  rating: selectedRating,
+                  comment: commentController.text,
+                );
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  if (success) {
+                    ref.invalidate(allMedicinesProvider);
+                  }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(success ? 'Review submitted! Refreshing...' : 'Failed to submit review'),
+                      backgroundColor: success ? const Color(0xFF34C759) : Colors.red,
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFBDFC70),
+                foregroundColor: const Color(0xFF13231A),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: const Text('Submit'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _DescriptionBody extends StatelessWidget {
@@ -372,17 +452,39 @@ class _DescriptionBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasDescription = medicine.description != null && medicine.description!.isNotEmpty;
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              if (medicine.brand != null && medicine.brand!.isNotEmpty)
+                _InfoChip(label: 'Brand', value: medicine.brand!),
+              if (medicine.strength != null && medicine.strength!.isNotEmpty)
+                _InfoChip(label: 'Strength', value: medicine.strength!),
+              if (medicine.category != null && medicine.category!.isNotEmpty)
+                _InfoChip(label: 'Category', value: medicine.category!),
+              if (medicine.expiryDate != null)
+                _InfoChip(label: 'Expires', value: medicine.expiryDate!, isWarning: true),
+              if (medicine.distanceKm != null)
+                _InfoChip(label: 'Distance', value: '${medicine.distanceKm!.toStringAsFixed(1)} km'),
+              _InfoChip(label: 'Rx', value: medicine.requiresPrescription ? 'Required' : 'Not required'),
+              _InfoChip(label: 'In Stock', value: medicine.stock.toString()),
+            ],
+          ),
+          const SizedBox(height: 20),
           Text(
             'product_summary'.tr(context),
             style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: Color(0xFF13231A)),
           ),
           const SizedBox(height: 8),
           Text(
-            'This medication is a highly effective treatment for ${medicine.name}. It works by targeting specific receptors to provide fast-acting relief while maintaining long-term stability.',
+            hasDescription
+                ? medicine.description!
+                : 'No description available for ${medicine.name}.',
             style: TextStyle(fontSize: 14, color: Colors.grey[700], height: 1.6),
           ),
         ],
@@ -391,12 +493,58 @@ class _DescriptionBody extends StatelessWidget {
   }
 }
 
-class _ReviewBody extends StatelessWidget {
+class _InfoChip extends StatelessWidget {
+  final String label;
+  final String value;
+  final bool isWarning;
+  const _InfoChip({required this.label, required this.value, this.isWarning = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: isWarning
+            ? const Color(0xFFFF6B6B).withOpacity(0.08)
+            : const Color(0xFFE8F5E9),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: isWarning
+              ? const Color(0xFFFF6B6B).withOpacity(0.3)
+              : const Color(0xFF34C759).withOpacity(0.3),
+        ),
+      ),
+      child: RichText(
+        text: TextSpan(
+          style: const TextStyle(fontSize: 11),
+          children: [
+            TextSpan(
+              text: '$label: ',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            TextSpan(
+              text: value,
+              style: TextStyle(
+                color: isWarning ? const Color(0xFFFF6B6B) : const Color(0xFF13231A),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ReviewBody extends ConsumerWidget {
   final Medicine medicine;
   const _ReviewBody({required this.medicine});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final reviews = medicine.reviews ?? [];
     return SingleChildScrollView(
       child: Column(
@@ -409,9 +557,19 @@ class _ReviewBody extends StatelessWidget {
                 'Recent Reviews',
                 style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: Color(0xFF13231A)),
               ),
-              Text(
-                '${reviews.length} reviews',
-                style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+              Row(
+                children: [
+                  Text(
+                    '${reviews.length} reviews',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    onPressed: () => _MedicineDetailScreenState._showReviewDialog(context, ref, medicine),
+                    icon: const Icon(Icons.add_comment_rounded, color: Color(0xFF34C759), size: 20),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ],
               ),
             ],
           ),
@@ -437,36 +595,64 @@ class _ReviewItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final name = review['user_name'] ?? 'Anonymous';
+    final initials = name.split(' ').map((e) => e[0].toUpperCase()).take(2).join();
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.grey[100]!),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                review['user_name'] ?? 'Anonymous',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              CircleAvatar(
+                radius: 18,
+                backgroundColor: const Color(0xFF34C759).withOpacity(0.1),
+                child: Text(
+                  initials,
+                  style: const TextStyle(
+                    color: Color(0xFF34C759),
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-              Row(
-                children: List.generate(5, (i) => Icon(
-                  Icons.star_rounded, 
-                  size: 14, 
-                  color: i < (review['rating'] ?? 5) ? Colors.amber : Colors.grey[200]
-                )),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF13231A)),
+                    ),
+                    Row(
+                      children: List.generate(5, (i) => Icon(
+                        Icons.star_rounded, 
+                        size: 14, 
+                        color: i < (review['rating'] ?? 5) ? Colors.amber : Colors.grey[200]
+                      )),
+                    ),
+                  ],
+                ),
               ),
+              if (review['created_at'] != null)
+                Text(
+                  DateFormat('MMM d').format(DateTime.parse(review['created_at'])),
+                  style: TextStyle(fontSize: 10, color: Colors.grey[400]),
+                ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Text(
             review['comment'] ?? 'No comment provided.',
-            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+            style: TextStyle(fontSize: 13, color: Colors.grey[700], height: 1.4),
           ),
         ],
       ),
@@ -492,7 +678,7 @@ class _InstructionsBody extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFBDFC70).withValues(alpha: 0.2),
+              color: const Color(0xFFBDFC70).withOpacity(0.2),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: const Color(0xFFBDFC70)),
             ),

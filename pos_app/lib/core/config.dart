@@ -1,8 +1,15 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 class AppConfig {
-  static const String baseUrl = 'https://ethio-pharma.onrender.com/api';
+  // Local Development (using your computer's LAN IP for physical device)
+  static const String lanIp = '192.168.137.1';
+  static const String localBaseUrl = 'http://$lanIp:8000/api';
   
-  // Use production link for all environments as requested by the user
-  static const String emulatorBaseUrl = 'https://ethio-pharma.onrender.com/api';
+  // Production Backend (Render)
+  static const String productionBaseUrl = 'https://ethio-pharma.onrender.com/api';
+
+  // Toggle this to switch between Local and Production
+  static const bool useProduction = false;
   
-  static String get apiBaseUrl => baseUrl;
+  static String get apiBaseUrl => useProduction ? productionBaseUrl : localBaseUrl;
 }
