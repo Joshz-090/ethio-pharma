@@ -20,6 +20,17 @@ class Pharmacy(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     
     is_active = models.BooleanField(default=True)
+    
+    # New Fields for Advanced Management
+    owner = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='owned_pharmacies')
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    verification_doc = models.URLField(max_length=500, null=True, blank=True)
+    payment_receipt = models.URLField(max_length=500, null=True, blank=True)
+    tax_id = models.CharField(max_length=50, null=True, blank=True)
+    opening_hours = models.JSONField(null=True, blank=True) # Format: [{"day": "Monday", "open": "08:00", "close": "20:00"}]
+    last_inventory_sync = models.DateTimeField(null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     @property
@@ -30,6 +41,17 @@ class Pharmacy(models.Model):
         if self.subscription_expiry and self.subscription_expiry < date.today():
             return False
         return True
+
+    @property
+    def average_rating(self):
+        try:
+            reviews = self.reviews.all()
+            if not reviews:
+                return 0.0
+            total = sum(r.rating for r in reviews if r.rating is not None)
+            return round(total / len(reviews), 1)
+        except Exception:
+            return 0.0
 
     class Meta:
         verbose_name_plural = "Pharmacies"

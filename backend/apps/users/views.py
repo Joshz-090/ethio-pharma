@@ -1,8 +1,36 @@
 from rest_framework import viewsets, permissions, status, generics
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.exceptions import AuthenticationFailed
+from django.contrib.auth import authenticate
 from .models import User, UserProfile
 from .serializers import UserProfileSerializer, RegisterSerializer
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        username = attrs.get(self.username_field)
+        password = attrs.get('password')
+        
+        user = authenticate(username=username, password=password)
+        
+        # If authentication failed, check if it's because the user is inactive
+        if user is None:
+            try:
+                temp_user = User.objects.get(username=username)
+                if temp_user.check_password(password) and not temp_user.is_active:
+                    raise AuthenticationFailed(
+                        {"detail": "Your account is pending admin approval.", "code": "account_pending"},
+                        code="account_pending"
+                    )
+            except User.DoesNotExist:
+                pass
+                
+        return super().validate(attrs)
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     """

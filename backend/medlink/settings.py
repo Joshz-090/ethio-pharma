@@ -173,6 +173,11 @@ CORS_ALLOWED_ORIGINS = [o.strip() for o in cors_env.split(',') if o.strip()] if 
 # =================
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Media Files (User uploads: receipts, license docs)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Deployment Security Headers

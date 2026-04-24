@@ -1,16 +1,21 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import Medicine, Inventory, Review
-from .serializers import MedicineSerializer, InventorySerializer, ReviewSerializer
+from .models import Medicine, Inventory, Review, Category, Sale
+from .serializers import MedicineSerializer, InventorySerializer, ReviewSerializer, CategorySerializer, SaleSerializer
 from .selectors import search_medicines_by_sector
 from analytics.services import log_search
 from core.common.permissions import IsAdmin, IsPharmacist, IsPatient
 
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.AllowAny]
+
 class MedicineViewSet(viewsets.ModelViewSet):
     queryset = Medicine.objects.all().prefetch_related('reviews', 'reviews__user')
     serializer_class = MedicineSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def list(self, request, *args, **kwargs):
         try:
@@ -39,24 +44,26 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class InventoryViewSet(viewsets.ModelViewSet):
     serializer_class = InventorySerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['medicine__name', 'medicine__brand', 'pharmacy__name', 'brand', 'strength']
 
     def get_queryset(self):
-        user = self.request.user
-        qs = Inventory.objects.all().select_related('medicine', 'pharmacy')
-        
-        # Check role safely
-        role = getattr(user.profile, 'role', None) if hasattr(user, 'profile') else None
+        # DEBUG: Returning everything to see what is in the database
+        return Inventory.objects.all().select_related('medicine', 'pharmacy')
 
-        if role == 'admin':
-            return qs
+    def perform_create(self, serializer):
+        user = self.request.user
+        try:
+            pharmacy = user.profile.pharmacy
+        except AttributeError:
+            pharmacy = None
             
-        if role == 'pharmacist':
-            if user.profile.pharmacy:
-                return qs.filter(pharmacy=user.profile.pharmacy)
-            return qs.none()
+        if not pharmacy:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError("You must be assigned to a pharmacy to add stock.")
             
-        return qs.filter(pharmacy__is_active=True, quantity__gt=0)
+        serializer.save(pharmacy=pharmacy)
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.AllowAny])
     def search(self, request):
@@ -72,13 +79,53 @@ class InventoryViewSet(viewsets.ModelViewSet):
         # Log for AI analytics
         log_search(query=query, user=request.user if request.user.is_authenticated else None, sector=sector)
         
-        # Execute localized search logic with GPS sorting
+        # Execute localized search logic with GPS, Trending, and Personalization
         results = search_medicines_by_sector(
             query=query, 
             sector=sector,
             user_lat=lat,
-            user_long=long
+            user_long=long,
+            user=request.user
         )
         
         serializer = self.get_serializer(results, many=True)
         return Response(serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def sell(self, request, pk=None):
+        """
+        Record a sale for an inventory item.
+        Decrements quantity and records revenue.
+        """
+        inventory = self.get_object()
+        sell_qty = int(request.data.get('quantity', 1))
+        
+        if inventory.quantity < sell_qty:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError("Not enough stock available.")
+            
+        # Create sale record
+        from .models import Sale
+        total_price = inventory.price * sell_qty
+        
+        Sale.objects.create(
+            pharmacy=inventory.pharmacy,
+            inventory_item=inventory,
+            quantity_sold=sell_qty,
+            total_price=total_price
+        )
+        
+        # Decrement inventory
+        inventory.quantity -= sell_qty
+        inventory.save()
+        
+        serializer = self.get_serializer(inventory)
+        return Response(serializer.data)
+
+class SaleViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    View set to fetch all sales (intended for Admin).
+    """
+    queryset = Sale.objects.all().order_by('-created_at')
+    serializer_class = SaleSerializer
+    permission_classes = [permissions.IsAuthenticated]
