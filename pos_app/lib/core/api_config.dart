@@ -12,7 +12,7 @@ class ApiConfig {
   static const String eyasuLocalBaseUrl = 'http://192.168.1.20:8000';
 
   // Fallback hosted backend.
-  static const String renderBaseUrl = 'https://medlink-arbaminch.onrender.com';
+  static const String renderBaseUrl = 'https://ethio-pharma.onrender.com';
 
   static String get baseUrl {
     if (_overrideBaseUrl.isNotEmpty) {

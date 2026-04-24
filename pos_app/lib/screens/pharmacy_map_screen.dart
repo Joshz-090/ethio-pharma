@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
-
-import '../data/mock_medicine_catalog.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/medicine_search_provider.dart';
 import '../models/medicine.dart';
 
-class PharmacyMapScreen extends StatefulWidget {
-  final Medicine medicine;
+class PharmacyMapScreen extends ConsumerStatefulWidget {
+  final Medicine? medicine;
 
-  const PharmacyMapScreen({super.key, required this.medicine});
+  const PharmacyMapScreen({super.key, this.medicine});
 
   @override
-  State<PharmacyMapScreen> createState() => _PharmacyMapScreenState();
+  ConsumerState<PharmacyMapScreen> createState() => _PharmacyMapScreenState();
 }
 
-class _PharmacyMapScreenState extends State<PharmacyMapScreen> {
+class _PharmacyMapScreenState extends ConsumerState<PharmacyMapScreen> {
   LatLng? _userLocation;
   final MapController _mapController = MapController();
 
@@ -31,45 +31,57 @@ class _PharmacyMapScreenState extends State<PharmacyMapScreen> {
       setState(() {
         _userLocation = LatLng(position.latitude, position.longitude);
       });
+      // If no medicine specified, center on user
+      if (widget.medicine == null) {
+        _mapController.move(_userLocation!, 14);
+      }
     } catch (e) {
       debugPrint('Error getting location for map: $e');
     }
   }
 
-  LatLng get _pharmacyLocation {
-    if (widget.medicine.pharmacyLatitude != null && widget.medicine.pharmacyLongitude != null) {
-      return LatLng(widget.medicine.pharmacyLatitude!, widget.medicine.pharmacyLongitude!);
+  LatLng get _centerLocation {
+    if (widget.medicine?.pharmacyLatitude != null && widget.medicine?.pharmacyLongitude != null) {
+      return LatLng(widget.medicine!.pharmacyLatitude!, widget.medicine!.pharmacyLongitude!);
     }
+    if (_userLocation != null) return _userLocation!;
     return const LatLng(6.0333, 37.55); // Arba Minch fallback
   }
 
   @override
   Widget build(BuildContext context) {
-    final markers = <Marker>[
-      // Selected Pharmacy Marker
-      Marker(
-        point: _pharmacyLocation,
-        width: 100,
-        height: 100,
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: const Color(0xFF13231A),
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 10)],
-              ),
-              child: const Text('Target', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
-            ),
-            const Icon(Icons.location_on_rounded, size: 48, color: Color(0xFF34C759)),
-          ],
-        ),
-      ),
+    final allMedsAsync = ref.watch(allMedicinesProvider);
+    final otherMeds = allMedsAsync.when(
+      data: (list) => list.where((m) => m.id != widget.medicine?.id && m.pharmacyLatitude != null).toList(),
+      loading: () => <Medicine>[],
+      error: (_, __) => <Medicine>[],
+    );
 
-      // Other Pharmacies (Highlighted)
-      ...mockMedicineCatalog
-          .where((m) => m.id != widget.medicine.id && m.pharmacyLatitude != null && m.pharmacyLongitude != null)
+    final markers = <Marker>[
+      // Selected Pharmacy Marker (if any)
+      if (widget.medicine != null)
+        Marker(
+          point: _centerLocation,
+          width: 100,
+          height: 100,
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF13231A),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10)],
+                ),
+                child: const Text('Target', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+              ),
+              const Icon(Icons.location_on_rounded, size: 48, color: Color(0xFF34C759)),
+            ],
+          ),
+        ),
+
+      // Other Pharmacies
+      ...otherMeds
           .map((m) => Marker(
                 point: LatLng(m.pharmacyLatitude!, m.pharmacyLongitude!),
                 width: 50,
@@ -90,7 +102,7 @@ class _PharmacyMapScreenState extends State<PharmacyMapScreen> {
           height: 60,
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.blue.withValues(alpha: 0.2),
+              color: Colors.blue.withOpacity(0.2),
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white, width: 2),
             ),
@@ -123,7 +135,7 @@ class _PharmacyMapScreenState extends State<PharmacyMapScreen> {
           FlutterMap(
             mapController: _mapController,
             options: MapOptions(
-              initialCenter: _pharmacyLocation,
+              initialCenter: _centerLocation,
               initialZoom: 14,
             ),
             children: [
@@ -146,7 +158,7 @@ class _PharmacyMapScreenState extends State<PharmacyMapScreen> {
                 borderRadius: BorderRadius.circular(28),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
+                    color: Colors.black.withOpacity(0.1),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -171,11 +183,11 @@ class _PharmacyMapScreenState extends State<PharmacyMapScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              widget.medicine.pharmacyName,
+                              widget.medicine?.pharmacyName ?? 'Nearby Pharmacies',
                               style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Color(0xFF13231A)),
                             ),
                             Text(
-                              widget.medicine.pharmacyAddress ?? 'Arba Minch',
+                              widget.medicine?.pharmacyAddress ?? 'Showing all pharmacies in your area',
                               style: const TextStyle(color: Colors.grey, fontSize: 14),
                             ),
                           ],
@@ -184,17 +196,9 @@ class _PharmacyMapScreenState extends State<PharmacyMapScreen> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  const Row(
-                    children: [
-                      Icon(Icons.info_outline_rounded, size: 14, color: Colors.blueGrey),
-                      SizedBox(width: 6),
-                      Text('High availability for search medicines here.', style: TextStyle(fontSize: 12, color: Colors.blueGrey)),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      _mapController.move(_pharmacyLocation, 16);
+                      _mapController.move(_centerLocation, 16);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF13231A),
@@ -203,7 +207,7 @@ class _PharmacyMapScreenState extends State<PharmacyMapScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                       elevation: 0,
                     ),
-                    child: const Text('Re-center to Pharmacy', style: TextStyle(fontWeight: FontWeight.bold)),
+                    child: const Text('Re-center', style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),

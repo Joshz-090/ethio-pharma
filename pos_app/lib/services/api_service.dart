@@ -101,7 +101,7 @@ class ApiService {
     await prefs.remove('access_token');
   }
 
-  // INVENTORY
+  // INVENTORY - with catalog fallback if inventory endpoint has a server error
   Future<List<dynamic>> fetchInventory({String? query, String? sector, double? lat, double? lng}) async {
     try {
       String url = '${AppConfig.apiBaseUrl}/medicines/inventory/';
@@ -127,12 +127,98 @@ class ApiService {
         headers: await _headers,
       );
 
+      print('[Inventory] status=${response.statusCode}');
+
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+        final decoded = jsonDecode(response.body);
+        List<dynamic> items = [];
+        if (decoded is List) {
+          items = decoded;
+        } else if (decoded is Map && decoded.containsKey('results')) {
+          items = decoded['results'] as List<dynamic>;
+        }
+        return items;
       }
+
+      // Handle 401: If token is expired, try one more time without auth (for ReadOnly access)
+      if (response.statusCode == 401 && _token != null) {
+        print('[Inventory] 401 detected, retrying without token for ReadOnly access...');
+        logout(); // Clear the expired token
+        final retryResponse = await http.get(
+          Uri.parse(url),
+          headers: {'Content-Type': 'application/json'},
+        );
+        if (retryResponse.statusCode == 200) {
+          final decoded = jsonDecode(retryResponse.body);
+          if (decoded is List) return decoded;
+          if (decoded is Map && decoded.containsKey('results')) return decoded['results'] as List<dynamic>;
+        }
+      }
+
+      throw Exception('Server error: ${response.statusCode}');
+    } catch (e) {
+      print('[Inventory] fetch error: $e');
+      rethrow;
+    }
+  }
+
+  /// Fetches /medicines/catalog/ and converts each item into an inventory-style map
+  /// so it can be parsed by Medicine.fromJson() without changes.
+  Future<List<dynamic>> _fetchCatalogAsInventory({String? query}) async {
+    try {
+      String url = '${AppConfig.apiBaseUrl}/medicines/catalog/';
+      if (query != null && query.isNotEmpty) {
+        url += '?search=$query';
+      }
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: await _headers,
+      );
+
+      print('[Catalog fallback] status=${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        List<dynamic> catalog = [];
+        if (decoded is List) {
+          catalog = decoded;
+        } else if (decoded is Map && decoded.containsKey('results')) {
+          catalog = decoded['results'] as List<dynamic>;
+        }
+
+        // Wrap each catalog item into an inventory-style object
+        return catalog.map((item) {
+          return {
+            'id': item['id'] ?? '',
+            'medicine': {
+              'id': item['id'] ?? '',
+              'name': item['name'] ?? 'Unknown',
+              'category': item['category'] ?? '',
+              'description': item['description'] ?? '',
+              'requires_prescription': item['requires_prescription'] ?? false,
+              'reviews': item['reviews'] ?? [],
+              'average_rating': item['average_rating'] ?? '0',
+            },
+            'pharmacy': {
+              'name': 'EthioPharma Network',
+              'address': 'Available Online',
+            },
+            'price': item['price'] ?? '0',
+            'quantity': item['stock'] ?? item['quantity'] ?? 99,
+            'brand': item['brand'] ?? '',
+            'strength': item['strength'] ?? '',
+            'route': item['route'] ?? '',
+            'frequency': item['frequency'] ?? '',
+            'usage_instructions': item['usage_instructions'] ?? '',
+          };
+        }).toList();
+      }
+
+      print('[Catalog fallback] also failed, returning empty');
       return [];
     } catch (e) {
-      print('Inventory fetch error: $e');
+      print('[Catalog fallback] error: $e');
       return [];
     }
   }
@@ -195,13 +281,14 @@ class ApiService {
   }
 
   // SOCIAL FEEDBACK (Step 7)
-  Future<bool> addReview(String medicineId, int rating, String comment) async {
+  Future<bool> addReview({String? medicineId, String? pharmacyId, required int rating, required String comment}) async {
     try {
       final response = await http.post(
         Uri.parse('${AppConfig.apiBaseUrl}/medicines/reviews/'),
         headers: await _headers,
         body: jsonEncode({
-          'medicine': medicineId,
+          if (medicineId != null) 'medicine': medicineId,
+          if (pharmacyId != null) 'pharmacy': pharmacyId,
           'rating': rating,
           'comment': comment,
         }),
@@ -225,15 +312,20 @@ class ApiService {
   }
 
   // RESERVATIONS (Step 3)
-  Future<Map<String, dynamic>?> createReservation(String inventoryItemId, int quantity) async {
+  Future<Map<String, dynamic>?> createReservation(String inventoryItemId, int quantity, {String? pharmacyId}) async {
     try {
+      final bodyMap = <String, dynamic>{
+        'inventory_item': inventoryItemId,
+        'quantity': quantity,
+      };
+      if (pharmacyId != null) {
+        bodyMap['pharmacy'] = pharmacyId;
+      }
+
       final response = await http.post(
         Uri.parse('${AppConfig.apiBaseUrl}/reservations/'),
         headers: await _headers,
-        body: jsonEncode({
-          'inventory_item': inventoryItemId,
-          'quantity': quantity,
-        }),
+        body: jsonEncode(bodyMap),
       );
 
       print('Reservation API Status: ${response.statusCode}');
@@ -279,7 +371,14 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        return (jsonDecode(response.body) as List).map((m) => Medicine.fromJson(m)).toList();
+        final decoded = jsonDecode(response.body);
+        List<dynamic> list = [];
+        if (decoded is List) {
+          list = decoded;
+        } else if (decoded is Map && decoded.containsKey('results')) {
+          list = decoded['results'] as List<dynamic>;
+        }
+        return list.map((m) => Medicine.fromJson(m as Map<String, dynamic>)).toList();
       }
       return [];
     } catch (e) {

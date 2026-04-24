@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../data/mock_medicine_catalog.dart';
@@ -469,14 +468,9 @@ class _ReservationScreenState extends ConsumerState<ReservationScreen> {
                                             ),
                                             const SizedBox(height: 2),
                                             Text(
-                                              NumberFormat.currency(
-                                                symbol: '\$',
-                                              ).format(
-                                                (medicine.price * _quantity) /
-                                                    4,
-                                              ),
+                                              '${(medicine.price * _quantity).toStringAsFixed(0)} ETB',
                                               style: const TextStyle(
-                                                fontSize: 38,
+                                                fontSize: 34,
                                                 height: 1,
                                                 color: Color(0xFF1F2A25),
                                               ),
@@ -538,7 +532,7 @@ class _ReservationScreenState extends ConsumerState<ReservationScreen> {
                                                           strokeWidth: 2,
                                                         ),
                                                   )
-                                                : const Text('Reserve Now'),
+                                                : const Text('Reserve for 60 mins'),
                                           ),
                                         ),
                                       ),
