@@ -22,7 +22,7 @@ urlpatterns = [
     path('api/pharmacies/', include('pharmacies.urls')),
     path('api/medicines/', include('medicines.urls')),
     path('api/reservations/', include('reservations.urls')),
-    path('api/analytics/', include('analytics.urls')),
+    path('api/analytics/', include('apps.analytics.urls')),
     path('api/users/', include('users.urls')),
     path('api/prescriptions/', include('prescriptions.urls')),
     path('api/ai/', include('ai_integration.urls')),

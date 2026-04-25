@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronUp, ChevronDown, Edit2, ToggleLeft, ToggleRight } from 'lucide-react';
+import { ChevronUp, ChevronDown, Edit2, ToggleLeft, ToggleRight, Plus, Minus } from 'lucide-react';
 import StatusBadge from '@/components/ui/StatusBadge';
 import { InventoryItem } from '@/lib/mockData';
 
@@ -12,6 +12,8 @@ interface InventoryTableProps {
   items: InventoryItem[];
   onEdit: (item: InventoryItem) => void;
   onToggle: (item: InventoryItem) => void;
+  onSell: (item: InventoryItem) => void;
+  onQuickAdd: (item: InventoryItem) => void;
 }
 
 const COL_WIDTHS = ['auto', '110px', '90px', '80px', '90px', '110px', '100px', '130px'];
@@ -26,7 +28,7 @@ const HEADERS: { label: string; key?: SortKey }[] = [
   { label: 'Actions' },
 ];
 
-export default function InventoryTable({ items, onEdit, onToggle }: InventoryTableProps) {
+export default function InventoryTable({ items, onEdit, onToggle, onSell, onQuickAdd }: InventoryTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>('medicineName');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
 
@@ -101,15 +103,45 @@ export default function InventoryTable({ items, onEdit, onToggle }: InventoryTab
                   {item.dosageForm}
                 </td>
                 <td style={{ padding: '13px 14px' }}>
-                  <span style={{
-                    fontSize: 14, fontWeight: 700,
-                    color: item.quantityOnHand === 0 ? '#ef4444' : item.quantityOnHand < 10 ? '#f59e0b' : 'var(--color-text-primary)',
-                  }}>
-                    {item.quantityOnHand}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+                      onClick={() => onSell(item)}
+                      disabled={item.quantityOnHand <= 0}
+                      style={{
+                        width: 24, height: 24, borderRadius: 6,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
+                        color: '#ef4444', cursor: item.quantityOnHand <= 0 ? 'not-allowed' : 'pointer',
+                        opacity: item.quantityOnHand <= 0 ? 0.4 : 1
+                      }}
+                    >
+                      <Minus size={12} strokeWidth={3} />
+                    </motion.button>
+
+                    <span style={{
+                      fontSize: 14, fontWeight: 700, minWidth: 24, textAlign: 'center',
+                      color: item.quantityOnHand === 0 ? '#ef4444' : item.quantityOnHand <= (item.reorderLevel || 10) ? '#f59e0b' : 'var(--color-text-primary)',
+                    }}>
+                      {item.quantityOnHand}
+                    </span>
+
+                    <motion.button
+                      whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+                      onClick={() => onQuickAdd(item)}
+                      style={{
+                        width: 24, height: 24, borderRadius: 6,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)',
+                        color: '#22c55e', cursor: 'pointer'
+                      }}
+                    >
+                      <Plus size={12} strokeWidth={3} />
+                    </motion.button>
+                  </div>
                 </td>
                 <td style={{ padding: '13px 14px', fontSize: 14, fontWeight: 600, color: 'var(--color-text-primary)' }}>
-                  {item.unitPrice.toFixed(2)}
+                  {(item.unitPrice || 0).toFixed(2)}
                 </td>
                 <td style={{ padding: '13px 14px', fontSize: 13, color: 'var(--color-text-secondary)' }}>
                   {item.expiryDate}

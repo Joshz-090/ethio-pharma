@@ -28,7 +28,13 @@ export default function LoginPage() {
     setError('');
     try {
       const auth = await login(username, password);
-      router.push(auth.role === 'admin' ? '/admin' : '/pharmacist');
+      if (auth.role === 'admin') {
+        router.push('/admin');
+      } else if (auth.status !== 'approved') {
+        router.push('/pharmacist/pending');
+      } else {
+        router.push('/pharmacist');
+      }
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Invalid username or password. Please try again.');
     } finally {

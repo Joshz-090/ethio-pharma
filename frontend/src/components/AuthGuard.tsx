@@ -34,16 +34,40 @@ export default function AuthGuard({ children, requiredRole, fallback }: AuthGuar
     setIsAuthenticated(true);
     setUserRole(role);
 
+    const status = localStorage.getItem('pharmacy_status');
+
     if (requiredRole && role !== requiredRole) {
       // Redirect to appropriate dashboard based on role
       if (role === 'admin') {
         router.push('/admin');
       } else if (role === 'pharmacist') {
-        router.push('/pharmacist');
+        if (status !== 'approved') {
+          router.push('/pharmacist/pending');
+        } else {
+          router.push('/pharmacist');
+        }
       } else {
         router.push('/login');
       }
       return;
+    }
+
+    // Special check for pharmacist status even if role matches
+    if (role === 'pharmacist') {
+      const isSubscriptionValid = localStorage.getItem('is_subscription_valid') === 'true';
+      
+      if (status !== 'approved') {
+        if (!window.location.pathname.includes('/pending')) {
+          router.push('/pharmacist/pending');
+          return;
+        }
+      } else if (!isSubscriptionValid) {
+        // Force them to a renewal/expired page
+        if (!window.location.pathname.includes('/expired')) {
+          router.push('/pharmacist/expired');
+          return;
+        }
+      }
     }
 
     setIsLoading(false);

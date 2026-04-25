@@ -5,8 +5,9 @@ import { Search, Filter, Plus } from 'lucide-react';
 import PageHeader from '@/components/ui/PageHeader';
 import InventoryTable from '@/components/inventory/InventoryTable';
 import EditStockModal from '@/components/inventory/EditStockModal';
+import AddStockModal from '@/components/inventory/AddStockModal';
 import { InventoryItem, InventoryStatus } from '@/lib/mockData';
-import { getInventory, updateStock, toggleAvailability } from '@/services/api';
+import { getInventory, updateStock, toggleAvailability, sellStock } from '@/services/api';
 
 const CATEGORIES = ['All', 'Painkiller', 'Antibiotic', 'Diabetes', 'Antimalarial', 'Gastric', 'Vitamin', 'Respiratory', 'Hydration'];
 const STATUSES: { label: string; value: InventoryStatus | 'all' }[] = [
@@ -27,7 +28,8 @@ export default function InventoryPage() {
   const [status, setStatus] = useState<'all' | InventoryStatus>('all');
   const [page, setPage] = useState(1);
   const [editItem, setEditItem] = useState<InventoryItem | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -38,16 +40,27 @@ export default function InventoryPage() {
       setIsLoading(true);
       const data = await getInventory();
       // Map backend schema to frontend component schema
-      const mapped = data.map((d: any) => ({
-        id: d.id,
-        medicineName: d.medicine?.name || 'Unknown',
-        genericName: d.medicine?.generic_name || '',
-        category: d.medicine?.category || 'Other',
-        quantityOnHand: d.quantity_on_hand,
-        unitPrice: d.unit_price,
-        isAvailable: d.is_available,
-        status: d.quantity_on_hand === 0 ? 'out_of_stock' : d.quantity_on_hand < 10 ? 'low_stock' : 'in_stock'
-      }));
+      const mapped = data.map((d: any) => {
+        const cat = d.medicine?.category;
+        const categoryName = (cat && typeof cat === 'object') ? cat.name : (cat || 'Other');
+        
+        return {
+          id: d.id,
+          medicineName: d.medicine?.name || 'Unknown',
+          genericName: d.medicine?.generic_name || '',
+          category: categoryName,
+          dosageForm: d.dosage_form || 'Tablet',
+          quantityOnHand: d.quantity || 0,
+          unitPrice: d.price || 0,
+          costPrice: d.cost_price || 0,
+          reorderLevel: d.reorder_level || 0,
+          expiryDate: d.expiry_date || '',
+          batchNumber: d.batch_number || '',
+          isOcrVerified: d.is_ocr_verified || false,
+          isAvailable: d.is_available,
+          status: (d.quantity || 0) === 0 ? 'out_of_stock' : (d.quantity || 0) <= (d.reorder_level || 10) ? 'low_stock' : 'in_stock'
+        };
+      });
       setItems(mapped);
     } catch (err) {
       console.error('Failed to load inventory', err);
@@ -67,7 +80,7 @@ export default function InventoryPage() {
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const handleEdit = (item: InventoryItem) => { setEditItem(item); setModalOpen(true); };
+  const handleEdit = (item: InventoryItem) => { setEditItem(item); setEditModalOpen(true); };
 
   const handleSave = async (id: string, quantity: number, price: number) => {
     await updateStock(id, quantity, price);
@@ -76,7 +89,26 @@ export default function InventoryPage() {
 
   const handleToggle = async (item: InventoryItem) => {
     await toggleAvailability(item.id, !item.isAvailable);
-    setItems(prev => prev.map(i => i.id === item.id ? { ...i, isAvailable: !i.isAvailable } : i));
+    fetchData();
+  };
+
+  const handleSell = async (item: InventoryItem) => {
+    if (item.quantityOnHand <= 0) return;
+    try {
+      await sellStock(item.id, 1);
+      fetchData();
+    } catch (err) {
+      console.error('Sale failed', err);
+    }
+  };
+
+  const handleQuickAdd = async (item: InventoryItem) => {
+    try {
+      await updateStock(item.id, item.quantityOnHand + 1, item.unitPrice);
+      fetchData();
+    } catch (err) {
+      console.error('Quick add failed', err);
+    }
   };
 
   const chipStyle = (active: boolean, color = '#0ea5e9') => ({
@@ -97,6 +129,7 @@ export default function InventoryPage() {
         action={
           <motion.button
             whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+            onClick={() => setAddModalOpen(true)}
             style={{
               display: 'flex', alignItems: 'center', gap: 8,
               padding: '10px 18px', borderRadius: 'var(--radius-md)',
@@ -170,7 +203,13 @@ export default function InventoryPage() {
             <span className="w-8 h-8 border-4 border-slate-600 border-t-teal-500 rounded-full animate-spin" />
           </div>
         ) : (
-          <InventoryTable items={paginated} onEdit={handleEdit} onToggle={handleToggle} />
+          <InventoryTable
+            items={paginated}
+            onEdit={handleEdit}
+            onToggle={handleToggle}
+            onSell={handleSell}
+            onQuickAdd={handleQuickAdd}
+          />
         )}
 
         {/* Pagination */}
@@ -201,9 +240,15 @@ export default function InventoryPage() {
 
       <EditStockModal
         item={editItem}
-        open={modalOpen}
-        onClose={() => { setModalOpen(false); setEditItem(null); }}
+        open={editModalOpen}
+        onClose={() => { setEditModalOpen(false); setEditItem(null); }}
         onSave={handleSave}
+      />
+
+      <AddStockModal
+        open={addModalOpen}
+        onClose={() => setAddModalOpen(false)}
+        onSuccess={fetchData}
       />
     </div>
   );

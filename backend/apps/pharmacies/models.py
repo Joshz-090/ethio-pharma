@@ -8,8 +8,11 @@ class Pharmacy(models.Model):
     address = models.TextField(null=True, blank=True)
     phone_number = models.CharField(max_length=20, null=True, blank=True)
     
-    subscription_plan = models.CharField(max_length=50, default='free') # 'free', 'pro', 'enterprise'
+    # 'trial', '1year', '2year', '5year'
+    subscription_tier = models.CharField(max_length=20, default='trial')
     subscription_expiry = models.DateField(null=True, blank=True)
+    trial_expiry = models.DateField(null=True, blank=True)
+    warning_sent = models.BooleanField(default=False)
     
     STATUS_CHOICES = [
         ('pending', 'Pending Approval'),
@@ -38,18 +41,47 @@ class Pharmacy(models.Model):
         from datetime import date
         if self.status != 'approved':
             return False
-        if self.subscription_expiry and self.subscription_expiry < date.today():
-            return False
-        return True
+        
+        today = date.today()
+        # Check subscription expiry
+        if self.subscription_expiry and self.subscription_expiry >= today:
+            return True
+        
+        # Check trial expiry
+        if self.trial_expiry and self.trial_expiry >= today:
+            return True
+            
+        return False
+
+    @property
+    def days_until_expiry(self):
+        from datetime import date
+        today = date.today()
+        
+        expiry = None
+        if self.subscription_expiry:
+            expiry = self.subscription_expiry
+        elif self.trial_expiry:
+            expiry = self.trial_expiry
+            
+        if not expiry:
+            return 0
+            
+        delta = expiry - today
+        return delta.days
+
+    @property
+    def needs_warning(self):
+        days = self.days_until_expiry
+        return 0 <= days <= 3
 
     @property
     def average_rating(self):
+        from django.db.models import Avg
         try:
-            reviews = self.reviews.all()
-            if not reviews:
-                return 0.0
-            total = sum(r.rating for r in reviews if r.rating is not None)
-            return round(total / len(reviews), 1)
+            result = self.reviews.aggregate(Avg('rating'))
+            rating = result['rating__avg']
+            return round(rating, 1) if rating is not None else 0.0
         except Exception:
             return 0.0
 

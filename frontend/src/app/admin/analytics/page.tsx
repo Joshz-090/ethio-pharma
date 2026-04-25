@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Activity, TrendingUp, MapPin, RefreshCw, AlertCircle, BarChart3, ChevronRight } from 'lucide-react';
+import { Activity, TrendingUp, MapPin, RefreshCw, AlertCircle, BarChart3, ChevronRight, Users, CreditCard, Building2, Package } from 'lucide-react';
 import PageHeader from '@/components/ui/PageHeader';
-import { getDemandPredictions } from '@/services/api';
+import { getDemandPredictions, getAdminDashboardStats } from '@/services/api';
 
 interface PredictionEntry {
   medicine_name: string;
@@ -15,6 +15,14 @@ interface PredictionEntry {
   trend: 'rising' | 'stable' | 'falling';
 }
 
+interface AdminStats {
+  pharmacies: { total: number; active: number; pending: number };
+  users: { pharmacists: number };
+  revenue: { monthly: number; total: number };
+  inventory: { total_items: number };
+  system_status: string;
+}
+
 const TREND_CONFIG = {
   rising:  { label: 'Rising',  color: '#059669', bg: '#ecfdf5', border: '#10b981' },
   stable:  { label: 'Stable',  color: '#d97706', bg: '#fffbeb', border: '#f59e0b' },
@@ -23,6 +31,7 @@ const TREND_CONFIG = {
 
 export default function AdminAnalyticsPage() {
   const [predictions, setPredictions] = useState<PredictionEntry[]>([]);
+  const [stats, setStats] = useState<AdminStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [sectorFilter, setSectorFilter] = useState('All');
@@ -33,11 +42,16 @@ export default function AdminAnalyticsPage() {
     setIsLoading(true);
     setError('');
     try {
-      const data = await getDemandPredictions();
-      const list = Array.isArray(data) ? data : (data.predictions || data.results || []);
+      const [predData, statsData] = await Promise.all([
+        getDemandPredictions(),
+        getAdminDashboardStats()
+      ]);
+      
+      const list = Array.isArray(predData) ? predData : (predData.predictions || predData.results || []);
       setPredictions(list);
+      setStats(statsData);
     } catch (err) {
-      setError('AI engine unavailable. Check backend service status.');
+      setError('Analytics engine partially unavailable. check backend status.');
     } finally {
       setIsLoading(false);
     }
@@ -50,15 +64,65 @@ export default function AdminAnalyticsPage() {
   return (
     <div className="space-y-8 pb-12">
       <PageHeader
-        title="Predictive Demand Analytics"
-        subtitle="AI-driven search and reservation forecasting for Arba Minch sectors"
-        breadcrumb={['Admin', 'AI Analytics']}
+        title="Admin Global Analytics"
+        subtitle="Real-time business performance and AI-driven forecasting"
+        breadcrumb={['Admin', 'Analytics Center']}
         action={
           <button onClick={fetchData} className="flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-sm font-bold transition-all shadow-sm">
             <RefreshCw size={15} className={isLoading ? 'animate-spin' : ''} /> Refresh Data
           </button>
         }
       />
+
+      {/* Stats Overview */}
+      {stats && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            className="p-8 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm">
+            <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-6">
+              <Building2 size={24} />
+            </div>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Total Pharmacies</p>
+            <div className="flex items-baseline gap-2">
+              <h4 className="text-3xl font-black text-slate-900">{stats.pharmacies.total}</h4>
+              <span className="text-xs font-bold text-orange-500">{stats.pharmacies.pending} pending</span>
+            </div>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+            className="p-8 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm">
+            <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-6">
+              <CreditCard size={24} />
+            </div>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Monthly Revenue</p>
+            <div className="flex items-baseline gap-1">
+              <span className="text-lg font-black text-slate-400">ETB</span>
+              <h4 className="text-3xl font-black text-slate-900">{stats.revenue.monthly.toLocaleString()}</h4>
+            </div>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+            className="p-8 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm">
+            <div className="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 mb-6">
+              <Users size={24} />
+            </div>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Active Partners</p>
+            <h4 className="text-3xl font-black text-slate-900">{stats.users.pharmacists}</h4>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+            className="p-8 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm">
+            <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white mb-6">
+              <Package size={24} />
+            </div>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Inventory Health</p>
+            <div className="flex items-center gap-2">
+              <h4 className="text-3xl font-black text-slate-900">{stats.inventory.total_items}</h4>
+              <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded-full">{stats.system_status}</span>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-32 gap-4">

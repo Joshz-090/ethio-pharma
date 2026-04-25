@@ -14,9 +14,12 @@ export interface InventoryItem {
   dosageForm: string;
   quantityOnHand: number;
   unitPrice: number;
+  costPrice?: number;
+  reorderLevel?: number;
   expiryDate: string;
   batchNumber: string;
   isAvailable: boolean;
+  isOcrVerified?: boolean;
   status: InventoryStatus;
 }
 

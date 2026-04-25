@@ -66,26 +66,23 @@ export async function login(username: string, password: string) {
     localStorage.setItem('access_token', res.data.access);
     localStorage.setItem('refresh_token', res.data.refresh);
     
-    // Fetch profile to get role
+    // Fetch profile to get role and status
     try {
       const profile = await getUserProfile();
       const role = profile.role || 'pharmacist';
+      const status = profile.pharmacy_status || 'approved';
       localStorage.setItem('user_role', role);
-      return { ...res.data, role };
+      localStorage.setItem('pharmacy_status', status);
+      localStorage.setItem('needs_subscription_warning', profile.needs_warning ? 'true' : 'false');
+      localStorage.setItem('days_until_expiry', profile.days_until_expiry?.toString() || '0');
+      localStorage.setItem('is_subscription_valid', profile.is_subscription_valid ? 'true' : 'false');
+      return { ...res.data, role, status };
     } catch (e) {
       console.error('Failed to fetch profile', e);
-      // Check if user is admin by checking is_staff status
-      try {
-        const userRes = await api.get('/users/profiles/');
-        const userData = Array.isArray(userRes.data) ? userRes.data[0] : userRes.data;
-        const role = userData.role || 'pharmacist';
-        localStorage.setItem('user_role', role);
-        return { ...res.data, role };
-      } catch (e2) {
-        console.error('Failed to get user data', e2);
-        localStorage.setItem('user_role', 'pharmacist');
-        return { ...res.data, role: 'pharmacist' };
-      }
+      // Fallback
+      localStorage.setItem('user_role', 'pharmacist');
+      localStorage.setItem('pharmacy_status', 'pending');
+      return { ...res.data, role: 'pharmacist', status: 'pending' };
     }
   }
   return res.data;
@@ -146,20 +143,43 @@ export async function getUsers() {
   return res.data;
 }
 
-export async function approvePharmacy(id: string) {
-  const res = await api.patch(`/pharmacies/${id}/`, { status: 'approved' });
+export async function updateUser(id: string, data: any) {
+  const res = await api.patch(`/users/profiles/${id}/`, data);
   return res.data;
 }
 
+export const approvePharmacy = async (id: string) => {
+  const response = await api.post(`/pharmacies/${id}/approve/`);
+  return response.data;
+};
+
+export const deletePharmacy = async (id: string) => {
+  const response = await api.delete(`/pharmacies/${id}/`);
+  return response.data;
+};
+
+export const sendWarning = async (id: string) => {
+  const response = await api.post(`/pharmacies/${id}/send_warning/`);
+  return response.data;
+};
+
 export async function registerPharmacy(data: any) {
-  const res = await api.post('/pharmacies/', data);
+  const config = data instanceof FormData 
+    ? { headers: { 'Content-Type': 'multipart/form-data' } }
+    : {};
+  const res = await api.post('/pharmacies/apply/', data, config);
   return res.data;
 }
 
 // ---- Inventory ----
 export async function getInventory(): Promise<InventoryItem[]> {
   if (USE_MOCK) return Promise.resolve(mockInventory);
-  const res = await api.get('/inventory/');
+  const res = await api.get('/medicines/inventory/');
+  return res.data;
+}
+
+export async function addInventoryItem(data: any): Promise<InventoryItem> {
+  const res = await api.post('/medicines/inventory/', data);
   return res.data;
 }
 
@@ -169,7 +189,22 @@ export async function updateStock(id: string, quantity: number, price: number): 
     if (item) { item.quantityOnHand = quantity; item.unitPrice = price; }
     return Promise.resolve(item!);
   }
-  const res = await api.patch(`/inventory/${id}/`, { quantity_on_hand: quantity, unit_price: price });
+  const res = await api.patch(`/medicines/inventory/${id}/`, { quantity, price });
+  return res.data;
+}
+
+export async function sellStock(id: string, quantity: number = 1): Promise<InventoryItem> {
+  const res = await api.post(`/medicines/inventory/${id}/sell/`, { quantity });
+  return res.data;
+}
+
+export async function getPharmacistRevenue() {
+  const res = await api.get('/analytics/pharmacist/');
+  return res.data;
+}
+
+export async function getSalesHistory() {
+  const res = await api.get('/medicines/sales/');
   return res.data;
 }
 
@@ -179,7 +214,7 @@ export async function toggleAvailability(id: string, isAvailable: boolean): Prom
     if (item) item.isAvailable = isAvailable;
     return Promise.resolve(item!);
   }
-  const res = await api.patch(`/inventory/${id}/`, { is_available: isAvailable });
+  const res = await api.patch(`/medicines/inventory/${id}/`, { is_available: isAvailable });
   return res.data;
 }
 
@@ -222,6 +257,11 @@ export async function getAnalytics() {
     });
   }
   const res = await api.get('/analytics/pharmacist/');
+  return res.data;
+}
+
+export async function getAdminDashboardStats() {
+  const res = await api.get('/analytics/admin/');
   return res.data;
 }
 

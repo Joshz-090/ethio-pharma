@@ -49,8 +49,25 @@ class InventoryViewSet(viewsets.ModelViewSet):
     search_fields = ['medicine__name', 'medicine__brand', 'pharmacy__name', 'brand', 'strength']
 
     def get_queryset(self):
-        # DEBUG: Returning everything to see what is in the database
-        return Inventory.objects.all().select_related('medicine', 'pharmacy')
+        user = self.request.user
+        qs = Inventory.objects.all().select_related('medicine', 'pharmacy')
+
+        # Patients see all available inventory (for search results etc)
+        if not user.is_authenticated:
+            return qs.filter(quantity__gt=0)
+            
+        # Admin sees everything
+        if hasattr(user, 'profile') and user.profile.role == 'admin':
+            return qs
+            
+        # Pharmacists see only their own pharmacy's inventory
+        if hasattr(user, 'profile') and user.profile.role == 'pharmacist':
+            if user.profile.pharmacy:
+                return qs.filter(pharmacy=user.profile.pharmacy)
+            return qs.none()
+            
+        # Regular patients see all available stock
+        return qs.filter(quantity__gt=0)
 
     def perform_create(self, serializer):
         user = self.request.user
@@ -124,8 +141,21 @@ class InventoryViewSet(viewsets.ModelViewSet):
 
 class SaleViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    View set to fetch all sales (intended for Admin).
+    View set to fetch sales history.
     """
-    queryset = Sale.objects.all().order_by('-created_at')
     serializer_class = SaleSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = Sale.objects.all().select_related('pharmacy', 'inventory_item', 'inventory_item__medicine').order_by('-created_at')
+        
+        if hasattr(user, 'profile') and user.profile.role == 'admin':
+            return qs
+            
+        if hasattr(user, 'profile') and user.profile.role == 'pharmacist':
+            if user.profile.pharmacy:
+                return qs.filter(pharmacy=user.profile.pharmacy)
+            return qs.none()
+            
+        return qs.none()

@@ -141,7 +141,7 @@ class ApiService {
       }
 
       // Handle 401: If token is expired, try one more time without auth (for ReadOnly access)
-      if (response.statusCode == 401 && _token != null) {
+      if (response.statusCode == 401) {
         print('[Inventory] 401 detected, retrying without token for ReadOnly access...');
         logout(); // Clear the expired token
         final retryResponse = await http.get(
@@ -153,13 +153,21 @@ class ApiService {
           if (decoded is List) return decoded;
           if (decoded is Map && decoded.containsKey('results')) return decoded['results'] as List<dynamic>;
         }
+        // If even the retry fails, fallback to catalog
+        print('[Inventory] Retry also failed, falling back to catalog...');
+        return await _fetchCatalogAsInventory(query: query);
       }
 
-      throw Exception('Server error: ${response.statusCode}');
+      if (response.statusCode != 200) {
+        print('[Inventory] fetch error: Server returned ${response.statusCode}');
+        return await _fetchCatalogAsInventory(query: query);
+      }
+      
     } catch (e) {
       print('[Inventory] fetch error: $e');
-      rethrow;
+      return await _fetchCatalogAsInventory(query: query);
     }
+    return [];
   }
 
   /// Fetches /medicines/catalog/ and converts each item into an inventory-style map

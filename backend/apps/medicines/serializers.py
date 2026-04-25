@@ -53,9 +53,9 @@ class InventorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Inventory
         fields = [
-            'id', 'price', 'quantity', 'is_available', 'distance', 'medicine', 'medicine_id', 'pharmacy', 
+            'id', 'price', 'cost_price', 'quantity', 'reorder_level', 'is_available', 'distance', 'medicine', 'medicine_id', 'pharmacy', 
             'brand', 'strength', 'route', 'frequency', 'recommended_duration', 
-            'usage_instructions', 'expiry_date', 'manufacture_date', 'batch_number'
+            'usage_instructions', 'expiry_date', 'manufacture_date', 'batch_number', 'is_ocr_verified'
         ]
 
     def get_is_available(self, obj):
