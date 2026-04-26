@@ -206,7 +206,7 @@ class _MedicationCard extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Column(
         children: [
@@ -215,7 +215,7 @@ class _MedicationCard extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: (medication.isCompleted ? Colors.grey : const Color(0xFF34C759)).withValues(alpha: 0.1),
+                  color: (medication.isCompleted ? Colors.grey : const Color(0xFF34C759)).withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -336,7 +336,7 @@ class _CountdownWidget extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: const Color(0xFF13231A).withValues(alpha: 0.05),
+            color: const Color(0xFF13231A).withOpacity(0.05),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(

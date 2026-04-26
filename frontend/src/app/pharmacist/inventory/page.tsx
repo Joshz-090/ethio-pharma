@@ -58,7 +58,7 @@ export default function InventoryPage() {
           batchNumber: d.batch_number || '',
           isOcrVerified: d.is_ocr_verified || false,
           isAvailable: d.is_available,
-          status: (d.quantity || 0) === 0 ? 'out_of_stock' : (d.quantity || 0) <= (d.reorder_level || 10) ? 'low_stock' : 'in_stock'
+          status: ((d.quantity || 0) === 0 ? 'out_of_stock' : (d.quantity || 0) <= (d.reorder_level || 10) ? 'low_stock' : 'in_stock') as InventoryStatus
         };
       });
       setItems(mapped);

@@ -98,16 +98,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               margin: const EdgeInsets.all(24),
               padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.85),
+                color: Colors.white.withOpacity(0.85),
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF0B8F63).withValues(alpha: 0.1),
+                    color: const Color(0xFF0B8F63).withOpacity(0.1),
                     blurRadius: 30,
                     offset: const Offset(0, 10),
                   ),
                   BoxShadow(
-                    color: Colors.white.withValues(alpha: 0.8),
+                    color: Colors.white.withOpacity(0.8),
                     blurRadius: 20,
                     offset: const Offset(-5, -5),
                   ),
@@ -127,7 +127,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF0B8F63).withValues(alpha: 0.3),
+                                color: const Color(0xFF0B8F63).withOpacity(0.3),
                                 blurRadius: 12,
                                 offset: const Offset(0, 4),
                               ),

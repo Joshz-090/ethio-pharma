@@ -113,7 +113,7 @@ export default function PharmacistSettingsPage() {
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                       <Calendar size={12} /> Time Remaining
                     </p>
-                    <p className={`text-lg font-black ${profile?.days_until_expiry <= 3 ? 'text-red-600' : 'text-slate-900'}`}>
+                    <p className={`text-lg font-black ${(profile?.days_until_expiry || 0) <= 3 ? 'text-red-600' : 'text-slate-900'}`}>
                       {profile?.days_until_expiry} Days
                     </p>
                   </div>

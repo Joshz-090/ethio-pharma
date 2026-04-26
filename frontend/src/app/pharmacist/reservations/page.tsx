@@ -97,9 +97,17 @@ function ReservationCard({
               </span>
               <StatusBadge status={r.status} size="sm" />
             </div>
+            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 6 }}>
+              <span style={{ fontSize: 13, color: 'var(--color-text-primary)', fontWeight: 600 }}>
+                Patient: {r.patientName}
+              </span>
+              <span style={{ fontSize: 13, color: '#3b82f6', fontWeight: 600 }}>
+                📞 {r.patientPhone}
+              </span>
+            </div>
             <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
               <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
-                Patient: <strong style={{ color: 'var(--color-text-secondary)' }}>{r.patientCode}</strong>
+                ID: <strong style={{ color: 'var(--color-text-secondary)' }}>{r.patientCode}</strong>
               </span>
               <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
                 Qty: <strong style={{ color: 'var(--color-text-secondary)' }}>{r.quantity}</strong>
@@ -108,7 +116,8 @@ function ReservationCard({
                 Total: <strong style={{ color: '#22c55e' }}>ETB {(r.quantity * r.unitPrice).toFixed(2)}</strong>
               </span>
             </div>
-            <div style={{ marginTop: 6, fontSize: 11, color: 'var(--color-text-muted)' }}>
+            <div style={{ marginTop: 8, fontSize: 11, color: 'var(--color-text-muted)', display: 'flex', gap: 8, alignItems: 'center' }}>
+              <Clock size={10} />
               Reserved: {new Date(r.reservedAt).toLocaleString()}
             </div>
           </div>
@@ -173,10 +182,12 @@ export default function ReservationsPage() {
       // Map backend schema to frontend component shape
       const mapped = data.map((d: any) => ({
         id: d.id,
-        medicineName: d.inventory?.medicine?.name || 'Unknown Medicine',
-        patientCode: d.user ? `USR-${d.user.toString().slice(0, 6)}` : 'Anonymous',
+        medicineName: d.inventory_item?.medicine?.name || 'Unknown Medicine',
+        patientCode: d.user?.id ? `USR-${d.user.id.toString().slice(0, 6)}` : 'Anonymous',
+        patientName: d.patient_name || 'Anonymous',
+        patientPhone: d.patient_phone || 'N/A',
         quantity: d.quantity,
-        unitPrice: d.inventory?.unit_price || 0,
+        unitPrice: d.inventory_item?.price || 0,
         status: d.status || 'pending',
         reservedAt: d.created_at || new Date().toISOString(),
         expiresAt: d.expires_at || new Date(Date.now() + 3600000).toISOString(),

@@ -26,6 +26,8 @@ export interface InventoryItem {
 export interface Reservation {
   id: string;
   patientCode: string; // anonymized e.g. PAT-0042
+  patientName?: string;
+  patientPhone?: string;
   medicineName: string;
   quantity: number;
   unitPrice: number;
@@ -86,16 +88,16 @@ const hoursAgo = (h: number) => new Date(now.getTime() - h * 3600000).toISOStrin
 const hoursFromNow = (h: number) => new Date(now.getTime() + h * 3600000).toISOString();
 
 export const mockReservations: Reservation[] = [
-  { id: 'res-001', patientCode: 'PAT-0042', medicineName: 'Paracetamol 500mg', quantity: 2, unitPrice: 4.50, status: 'pending', reservedAt: hoursAgo(1), expiresAt: hoursFromNow(1) },
-  { id: 'res-002', patientCode: 'PAT-0119', medicineName: 'Amoxicillin 250mg', quantity: 1, unitPrice: 12.00, status: 'pending', reservedAt: hoursAgo(0.5), expiresAt: hoursFromNow(1.5) },
-  { id: 'res-003', patientCode: 'PAT-0007', medicineName: 'Metformin 500mg', quantity: 3, unitPrice: 8.75, status: 'fulfilled', reservedAt: hoursAgo(5), expiresAt: hoursAgo(3) },
-  { id: 'res-004', patientCode: 'PAT-0088', medicineName: 'Chloroquine 250mg', quantity: 1, unitPrice: 9.00, status: 'fulfilled', reservedAt: hoursAgo(8), expiresAt: hoursAgo(6) },
-  { id: 'res-005', patientCode: 'PAT-0033', medicineName: 'Ibuprofen 400mg', quantity: 2, unitPrice: 6.00, status: 'expired', reservedAt: hoursAgo(10), expiresAt: hoursAgo(8) },
-  { id: 'res-006', patientCode: 'PAT-0211', medicineName: 'Vitamin C 500mg', quantity: 5, unitPrice: 2.50, status: 'pending', reservedAt: hoursAgo(0.2), expiresAt: hoursFromNow(1.8) },
-  { id: 'res-007', patientCode: 'PAT-0055', medicineName: 'Omeprazole 20mg', quantity: 1, unitPrice: 15.00, status: 'cancelled', reservedAt: hoursAgo(6), expiresAt: hoursAgo(4) },
-  { id: 'res-008', patientCode: 'PAT-0099', medicineName: 'Insulin Glargine', quantity: 1, unitPrice: 180.00, status: 'pending', reservedAt: hoursAgo(0.3), expiresAt: hoursFromNow(1.7) },
-  { id: 'res-009', patientCode: 'PAT-0144', medicineName: 'Salbutamol Inhaler', quantity: 1, unitPrice: 95.00, status: 'fulfilled', reservedAt: hoursAgo(12), expiresAt: hoursAgo(10) },
-  { id: 'res-010', patientCode: 'PAT-0066', medicineName: 'Doxycycline 100mg', quantity: 2, unitPrice: 18.00, status: 'expired', reservedAt: hoursAgo(14), expiresAt: hoursAgo(12) },
+  { id: 'res-001', patientCode: 'PAT-0042', patientName: 'Abebe Bikila', patientPhone: '0911223344', medicineName: 'Paracetamol 500mg', quantity: 2, unitPrice: 4.50, status: 'pending', reservedAt: hoursAgo(1), expiresAt: hoursFromNow(1) },
+  { id: 'res-002', patientCode: 'PAT-0119', patientName: 'Mulugeta Tesfaye', patientPhone: '0922334455', medicineName: 'Amoxicillin 250mg', quantity: 1, unitPrice: 12.00, status: 'pending', reservedAt: hoursAgo(0.5), expiresAt: hoursFromNow(1.5) },
+  { id: 'res-003', patientCode: 'PAT-0007', patientName: 'Tadesse Lemma', patientPhone: '0933445566', medicineName: 'Metformin 500mg', quantity: 3, unitPrice: 8.75, status: 'fulfilled', reservedAt: hoursAgo(5), expiresAt: hoursAgo(3) },
+  { id: 'res-004', patientCode: 'PAT-0088', patientName: 'Chala Beyene', patientPhone: '0944556677', medicineName: 'Chloroquine 250mg', quantity: 1, unitPrice: 9.00, status: 'fulfilled', reservedAt: hoursAgo(8), expiresAt: hoursAgo(6) },
+  { id: 'res-005', patientCode: 'PAT-0033', patientName: 'Hirut Melaku', patientPhone: '0955667788', medicineName: 'Ibuprofen 400mg', quantity: 2, unitPrice: 6.00, status: 'expired', reservedAt: hoursAgo(10), expiresAt: hoursAgo(8) },
+  { id: 'res-006', patientCode: 'PAT-0211', patientName: 'Almaz Ayana', patientPhone: '0911998877', medicineName: 'Vitamin C 500mg', quantity: 5, unitPrice: 2.50, status: 'pending', reservedAt: hoursAgo(0.2), expiresAt: hoursFromNow(1.8) },
+  { id: 'res-007', patientCode: 'PAT-0055', patientName: 'Kebede Balcha', patientPhone: '0922110099', medicineName: 'Omeprazole 20mg', quantity: 1, unitPrice: 15.00, status: 'cancelled', reservedAt: hoursAgo(6), expiresAt: hoursAgo(4) },
+  { id: 'res-008', patientCode: 'PAT-0099', patientName: 'Senait Giday', patientPhone: '0933442211', medicineName: 'Insulin Glargine', quantity: 1, unitPrice: 180.00, status: 'pending', reservedAt: hoursAgo(0.3), expiresAt: hoursFromNow(1.7) },
+  { id: 'res-009', patientCode: 'PAT-0144', patientName: 'Derartu Tulu', patientPhone: '0911224466', medicineName: 'Salbutamol Inhaler', quantity: 1, unitPrice: 95.00, status: 'fulfilled', reservedAt: hoursAgo(12), expiresAt: hoursAgo(10) },
+  { id: 'res-010', patientCode: 'PAT-0066', patientName: 'Kenenisa Bekele', patientPhone: '0922335577', medicineName: 'Doxycycline 100mg', quantity: 2, unitPrice: 18.00, status: 'expired', reservedAt: hoursAgo(14), expiresAt: hoursAgo(12) },
 ];
 
 // ---- ANALYTICS ----

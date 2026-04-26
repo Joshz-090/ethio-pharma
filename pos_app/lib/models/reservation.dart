@@ -9,6 +9,7 @@ class Reservation {
   final DateTime createdAt;
   final DateTime expiresAt;
   final String status;
+  final String? pharmacyPhone;
 
   Reservation({
     required this.id,
@@ -19,6 +20,7 @@ class Reservation {
     required this.createdAt,
     required this.expiresAt,
     required this.status,
+    this.pharmacyPhone,
   });
 
   factory Reservation.fromJson(Map<String, dynamic> json) {
@@ -42,6 +44,7 @@ class Reservation {
       createdAt: DateTime.parse(json['created_at']),
       expiresAt: DateTime.parse(json['expires_at']),
       status: json['status'] as String? ?? 'pending',
+      pharmacyPhone: pharmacy['phone_number']?.toString(),
     );
   }
 
