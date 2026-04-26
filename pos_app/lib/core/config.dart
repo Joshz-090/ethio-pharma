@@ -9,7 +9,7 @@ class AppConfig {
   static const String productionBaseUrl = 'https://ethio-pharma.onrender.com/api';
 
   // Toggle this to switch between Local and Production
-  static const bool useProduction = false;
+  static const bool useProduction = true;
   
   static String get apiBaseUrl => useProduction ? productionBaseUrl : localBaseUrl;
 }

@@ -32,6 +32,30 @@ paths:
       responses:
         '200':
           description: No response body
+  /api/analytics/admin/:
+    get:
+      operationId: analytics_admin_retrieve
+      description: API Endpoint for Admin Dashboard summary stats.
+      tags:
+      - analytics
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/analytics/pharmacist/:
+    get:
+      operationId: analytics_pharmacist_retrieve
+      description: API Endpoint for Pharmacist Revenue and Income analytics.
+      tags:
+      - analytics
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
   /api/analytics/trending/:
     get:
       operationId: analytics_trending_retrieve
@@ -774,7 +798,7 @@ paths:
   /api/medicines/sales/:
     get:
       operationId: medicines_sales_list
-      description: View set to fetch all sales (intended for Admin).
+      description: View set to fetch sales history.
       tags:
       - medicines
       security:
@@ -792,7 +816,7 @@ paths:
   /api/medicines/sales/{id}/:
     get:
       operationId: medicines_sales_retrieve
-      description: View set to fetch all sales (intended for Admin).
+      description: View set to fetch sales history.
       parameters:
       - in: path
         name: id
@@ -999,6 +1023,41 @@ paths:
               schema:
                 $ref: '#/components/schemas/Pharmacy'
           description: ''
+  /api/pharmacies/{id}/send_warning/:
+    post:
+      operationId: pharmacies_send_warning_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this pharmacy.
+        required: true
+      tags:
+      - pharmacies
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pharmacy'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Pharmacy'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Pharmacy'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pharmacy'
+          description: ''
   /api/pharmacies/apply/:
     post:
       operationId: pharmacies_apply_create
@@ -1020,6 +1079,21 @@ paths:
       - jwtAuth: []
       - cookieAuth: []
       - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pharmacy'
+          description: ''
+  /api/pharmacies/my_pharmacy/:
+    get:
+      operationId: pharmacies_my_pharmacy_retrieve
+      tags:
+      - pharmacies
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
       responses:
         '200':
           content:
@@ -1696,7 +1770,15 @@ components:
         price:
           type: number
           format: double
+        cost_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
         quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        reorder_level:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
@@ -1753,6 +1835,8 @@ components:
           type: string
           nullable: true
           maxLength: 100
+        is_ocr_verified:
+          type: boolean
       required:
       - distance
       - id
@@ -1830,7 +1914,15 @@ components:
         price:
           type: number
           format: double
+        cost_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
         quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        reorder_level:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
@@ -1887,6 +1979,8 @@ components:
           type: string
           nullable: true
           maxLength: 100
+        is_ocr_verified:
+          type: boolean
     PatchedMedicine:
       type: object
       properties:
@@ -1941,9 +2035,16 @@ components:
           nullable: true
           maxLength: 20
         status:
-          $ref: '#/components/schemas/PharmacyStatusEnum'
+          $ref: '#/components/schemas/StatusB7aEnum'
         is_active:
           type: boolean
+        owner_name:
+          type: string
+          nullable: true
+        contact_phone:
+          type: string
+          nullable: true
+          readOnly: true
         owner_email:
           type: string
           readOnly: true
@@ -1974,6 +2075,32 @@ components:
         average_rating:
           type: string
           readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        subscription_tier:
+          type: string
+          maxLength: 20
+        subscription_expiry:
+          type: string
+          format: date
+          nullable: true
+        trial_expiry:
+          type: string
+          format: date
+          nullable: true
+        days_until_expiry:
+          type: string
+          readOnly: true
+        needs_warning:
+          type: string
+          readOnly: true
+        is_subscription_valid:
+          type: string
+          readOnly: true
+        warning_sent:
+          type: boolean
     PatchedPrescription:
       type: object
       properties:
@@ -2078,7 +2205,7 @@ components:
           type: string
           format: uuid
           readOnly: true
-        user:
+        user_details:
           allOf:
           - $ref: '#/components/schemas/User'
           readOnly: true
@@ -2090,10 +2217,45 @@ components:
           type: string
           format: uuid
           nullable: true
+        pharmacy_status:
+          allOf:
+          - $ref: '#/components/schemas/PharmacyStatusEnum'
+          readOnly: true
+        subscription_tier:
+          type: string
+          readOnly: true
+        days_until_expiry:
+          type: string
+          readOnly: true
+        is_subscription_valid:
+          type: string
+          readOnly: true
+        needs_subscription_warning:
+          type: string
+          readOnly: true
+        warning_sent:
+          type: boolean
+          readOnly: true
         phone_number:
           type: string
           nullable: true
           maxLength: 20
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          readOnly: true
+        email:
+          type: string
+          format: email
+          title: Email address
+          readOnly: true
+        is_active:
+          type: boolean
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
     Pharmacy:
       type: object
       properties:
@@ -2116,9 +2278,16 @@ components:
           nullable: true
           maxLength: 20
         status:
-          $ref: '#/components/schemas/PharmacyStatusEnum'
+          $ref: '#/components/schemas/StatusB7aEnum'
         is_active:
           type: boolean
+        owner_name:
+          type: string
+          nullable: true
+        contact_phone:
+          type: string
+          nullable: true
+          readOnly: true
         owner_email:
           type: string
           readOnly: true
@@ -2149,10 +2318,41 @@ components:
         average_rating:
           type: string
           readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        subscription_tier:
+          type: string
+          maxLength: 20
+        subscription_expiry:
+          type: string
+          format: date
+          nullable: true
+        trial_expiry:
+          type: string
+          format: date
+          nullable: true
+        days_until_expiry:
+          type: string
+          readOnly: true
+        needs_warning:
+          type: string
+          readOnly: true
+        is_subscription_valid:
+          type: string
+          readOnly: true
+        warning_sent:
+          type: boolean
       required:
       - average_rating
+      - contact_phone
+      - created_at
+      - days_until_expiry
       - id
+      - is_subscription_valid
       - name
+      - needs_warning
       - owner_email
     PharmacyStatusEnum:
       enum:
@@ -2375,6 +2575,18 @@ components:
       - pharmacy_name
       - quantity_sold
       - total_price
+    StatusB7aEnum:
+      enum:
+      - pending
+      - approved
+      - rejected
+      - suspended
+      type: string
+      description: |-
+        * `pending` - Pending Approval
+        * `approved` - Approved
+        * `rejected` - Rejected
+        * `suspended` - Suspended
     TokenRefresh:
       type: object
       properties:
@@ -2411,6 +2623,14 @@ components:
         last_name:
           type: string
           maxLength: 150
+        is_active:
+          type: boolean
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        date_joined:
+          type: string
+          format: date-time
       required:
       - id
       - username
@@ -2421,7 +2641,7 @@ components:
           type: string
           format: uuid
           readOnly: true
-        user:
+        user_details:
           allOf:
           - $ref: '#/components/schemas/User'
           readOnly: true
@@ -2433,13 +2653,57 @@ components:
           type: string
           format: uuid
           nullable: true
+        pharmacy_status:
+          allOf:
+          - $ref: '#/components/schemas/PharmacyStatusEnum'
+          readOnly: true
+        subscription_tier:
+          type: string
+          readOnly: true
+        days_until_expiry:
+          type: string
+          readOnly: true
+        is_subscription_valid:
+          type: string
+          readOnly: true
+        needs_subscription_warning:
+          type: string
+          readOnly: true
+        warning_sent:
+          type: boolean
+          readOnly: true
         phone_number:
           type: string
           nullable: true
           maxLength: 20
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          readOnly: true
+        email:
+          type: string
+          format: email
+          title: Email address
+          readOnly: true
+        is_active:
+          type: boolean
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
       required:
+      - date_joined
+      - days_until_expiry
+      - email
       - id
-      - user
+      - is_subscription_valid
+      - needs_subscription_warning
+      - pharmacy_status
+      - subscription_tier
+      - user_details
+      - username
+      - warning_sent
   securitySchemes:
     cookieAuth:
       type: apiKey

@@ -37,6 +37,17 @@ class ReservationNotifier extends AsyncNotifier<List<Reservation>> {
     }
     return false;
   }
+
+  Future<bool> cancelReservation(String reservationId) async {
+    final success = await ApiService().cancelReservation(reservationId);
+    if (success) {
+      // Remove from local mock list if it was a mock
+      _localMockReservations.removeWhere((r) => r.id == reservationId);
+      await refresh();
+      return true;
+    }
+    return false;
+  }
 }
 
 final reservationProvider =

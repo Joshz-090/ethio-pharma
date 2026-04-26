@@ -16,6 +16,7 @@ import 'medicine_detail.dart';
 import 'pharmacy_map_screen.dart';
 import 'login_screen.dart';
 import 'schedule_screen.dart';
+import '../core/config.dart';
 
 class MedicineSearchScreen extends ConsumerStatefulWidget {
   const MedicineSearchScreen({super.key});
@@ -287,7 +288,7 @@ class _MedicineSearchScreenState extends ConsumerState<MedicineSearchScreen> {
         Expanded(
           child: ref.watch(medicineSearchProvider).when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, _) => Center(child: Text(error.toString())),
+            error: (error, _) => _buildErrorState(error),
             data: (medicines) {
               final categories = ref.watch(categoriesProvider);
               final activeCat = ref.watch(activeCategoryProvider);
@@ -358,7 +359,27 @@ class _MedicineSearchScreenState extends ConsumerState<MedicineSearchScreen> {
                     const SizedBox(height: 16),
 
                     if (medicines.isEmpty)
-                      const Center(child: Padding(padding: EdgeInsets.only(top: 40), child: Text('No medicines match your search.')))
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 60, left: 40, right: 40),
+                          child: Column(
+                            children: [
+                              Icon(Icons.search_off_rounded, size: 64, color: Colors.grey[300]),
+                              const SizedBox(height: 16),
+                              Text(
+                                'No medicines found',
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey[700]),
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                'Try checking your connection or search for something else.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
                     else
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -392,6 +413,50 @@ class _MedicineSearchScreenState extends ConsumerState<MedicineSearchScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildErrorState(Object error) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.red[50],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.wifi_off_rounded, size: 48, color: Colors.red[400]),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'Connection Error',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Make sure your backend is running at ${AppConfig.lanIp} and your device is on the same network.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton.icon(
+              onPressed: () => ref.read(allMedicinesProvider.notifier).refresh(),
+              icon: const Icon(Icons.refresh_rounded),
+              label: const Text('Try Again'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF34C759),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -525,12 +590,12 @@ class _OrdersTabContent extends ConsumerWidget {
   }
 }
 
-class _OrderListItem extends StatelessWidget {
+class _OrderListItem extends ConsumerWidget {
   final Reservation reservation;
   const _OrderListItem({required this.reservation});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isExpired = reservation.isExpired;
     final statusColor = isExpired ? Colors.red : (reservation.status == 'fulfilled' ? const Color(0xFF34C759) : Colors.orange);
     
@@ -599,6 +664,17 @@ class _OrderListItem extends StatelessWidget {
                   ),
                 ],
               ),
+              if (reservation.pharmacyPhone != null)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text('Pharmacy Phone', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    Text(
+                      reservation.pharmacyPhone!,
+                      style: const TextStyle(color: Color(0xFF3b82f6), fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
+                  ],
+                ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -612,23 +688,55 @@ class _OrderListItem extends StatelessWidget {
             ],
           ),
           if (!isExpired && reservation.status == 'pending') ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.orange.withOpacity(0.2)),
+                color: const Color(0xFFF0F5F2),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFF34C759).withOpacity(0.1)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.access_time_rounded, color: Colors.orange, size: 16),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Expires in: ${reservation.remainingTime.inMinutes} mins',
-                    style: const TextStyle(color: Colors.orange, fontSize: 12, fontWeight: FontWeight.bold),
-                  ),
+                  const Icon(Icons.timer_outlined, size: 18, color: Color(0xFF34C759)),
+                  const SizedBox(width: 12),
+                  const Text('Expires in:', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                  const Spacer(),
+                  _LiveCountdown(expiresAt: reservation.expiresAt),
                 ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton.icon(
+                onPressed: () async {
+                  final confirmed = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Cancel Reservation?'),
+                      content: const Text('Are you sure you want to release this medicine hold?'),
+                      actions: [
+                        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('No')),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          child: const Text('Yes, Cancel', style: TextStyle(color: Colors.red)),
+                        ),
+                      ],
+                    ),
+                  );
+                  if (confirmed == true) {
+                    // Call cancellation API
+                    await ref.read(reservationProvider.notifier).cancelReservation(reservation.id);
+                  }
+                },
+                icon: const Icon(Icons.close_rounded, size: 16, color: Colors.red),
+                label: const Text('Cancel Reservation', style: TextStyle(color: Colors.red, fontSize: 13, fontWeight: FontWeight.bold)),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  backgroundColor: Colors.red.withOpacity(0.05),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
               ),
             ),
           ]
@@ -798,6 +906,46 @@ class _ProfileView extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _LiveCountdown extends StatefulWidget {
+  final DateTime expiresAt;
+  const _LiveCountdown({required this.expiresAt});
+
+  @override
+  State<_LiveCountdown> createState() => _LiveCountdownState();
+}
+
+class _LiveCountdownState extends State<_LiveCountdown> {
+  late DateTime _now;
+  late final Stream<DateTime> _timerStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _now = DateTime.now();
+    _timerStream = Stream.periodic(const Duration(seconds: 1), (_) => DateTime.now());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<DateTime>(
+      stream: _timerStream,
+      builder: (context, snapshot) {
+        final now = snapshot.data ?? _now;
+        if (now.isAfter(widget.expiresAt)) {
+          return const Text('Expired', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold));
+        }
+        final diff = widget.expiresAt.difference(now);
+        final minutes = diff.inMinutes.toString().padLeft(2, '0');
+        final seconds = (diff.inSeconds % 60).toString().padLeft(2, '0');
+        return Text(
+          '$minutes:$seconds',
+          style: const TextStyle(color: Color(0xFF13231A), fontWeight: FontWeight.w900, fontSize: 16),
+        );
+      },
     );
   }
 }

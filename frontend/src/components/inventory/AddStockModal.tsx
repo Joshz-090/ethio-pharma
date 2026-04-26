@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as m, AnimatePresence as AP } from 'framer-motion';
 import { X, Plus, Search, Pill, Check, Camera, Scan, BarChart3, AlertCircle, Info, Database, Layers } from 'lucide-react';
 import { getCatalog, addInventoryItem } from '@/services/api';
 

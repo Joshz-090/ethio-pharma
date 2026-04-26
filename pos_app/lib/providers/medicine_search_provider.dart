@@ -73,9 +73,7 @@ class AllMedicinesNotifier extends StateNotifier<AsyncValue<List<Medicine>>> {
 
     } catch (e, st) {
       debugPrint('[AllMedicines] Load failed: $e');
-      if (state.value == null) {
-        state = AsyncValue.error(e, st);
-      }
+      state = AsyncValue.error(e, st);
     }
   }
 
@@ -186,7 +184,7 @@ final medicineSearchProvider =
 
   return allAsync.when(
     loading: () => const AsyncValue.loading(),
-    error: (e, st) => AsyncValue.error(e, st),
+    error: (error, stack) => AsyncValue.error(error, stack),
     data: (medicines) {
       var filtered = medicines;
 

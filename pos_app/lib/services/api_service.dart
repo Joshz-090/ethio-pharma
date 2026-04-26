@@ -165,9 +165,10 @@ class ApiService {
       
     } catch (e) {
       print('[Inventory] fetch error: $e');
-      return await _fetchCatalogAsInventory(query: query);
+      // Rethrow to allow provider to handle error state
+      rethrow;
     }
-    return [];
+    return []; // Ensure a value is returned if no condition matches
   }
 
   /// Fetches /medicines/catalog/ and converts each item into an inventory-style map
@@ -227,7 +228,7 @@ class ApiService {
       return [];
     } catch (e) {
       print('[Catalog fallback] error: $e');
-      return [];
+      rethrow;
     }
   }
 
@@ -368,6 +369,21 @@ class ApiService {
     } catch (e) {
       print('Reservation Exception: $e');
       return null;
+    }
+  }
+
+  Future<bool> cancelReservation(String reservationId) async {
+    try {
+      if (reservationId.startsWith('demo_res_')) return true; 
+
+      final response = await http.patch(
+        Uri.parse('${AppConfig.apiBaseUrl}/reservations/$reservationId/'),
+        headers: await _headers,
+        body: jsonEncode({'status': 'cancelled'}),
+      );
+      return response.statusCode == 200 || response.statusCode == 204;
+    } catch (e) {
+      return false;
     }
   }
 
