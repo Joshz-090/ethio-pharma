@@ -1,4 +1,5 @@
 import os
+# trigger reload again
 import sys
 from pathlib import Path
 from datetime import timedelta
@@ -14,7 +15,7 @@ sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 # Load .env file from the project root (for local development)
 ENV_PATH = BASE_DIR / '.env'
 if ENV_PATH.exists():
-    load_dotenv(ENV_PATH)
+    load_dotenv(ENV_PATH, override=True)
     print("Loaded .env file from project root")
 else:
     print("INFO: .env file not found, using environment variables (production mode)")
@@ -110,21 +111,29 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'medlink.wsgi.application'
 
-# 3. DATABASE (PostgreSQL / Supabase)
-# ===================================
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT', '5432'),
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
+# Use PostgreSQL (Supabase) if DB_HOST is provided, otherwise fallback to SQLite
+db_host = os.getenv('DB_HOST')
+if db_host and db_host != 'your-render-db-host':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'postgres'),
+            'USER': os.getenv('DB_USER'),
+            'PASSWORD': os.getenv('DB_PASSWORD'),
+            'HOST': db_host,
+            'PORT': os.getenv('DB_PORT', '5432'),
+            'OPTIONS': {
+                'sslmode': 'require',
+            },
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # 4. AUTHENTICATION (Security Focused)
 # ====================================

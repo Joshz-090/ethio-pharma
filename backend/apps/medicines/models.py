@@ -28,8 +28,10 @@ class Inventory(models.Model):
     medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE, related_name='inventories')
     
     # Pricing & Quantity
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=2) # Selling Price
+    cost_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     quantity = models.IntegerField(default=0)
+    reorder_level = models.IntegerField(default=10)
     
     # Professional Medical Details
     brand = models.CharField(max_length=255, null=True, blank=True) # e.g., Panadol, GS-Amox
@@ -43,6 +45,7 @@ class Inventory(models.Model):
     expiry_date = models.DateField(null=True, blank=True)
     manufacture_date = models.DateField(null=True, blank=True)
     batch_number = models.CharField(max_length=100, null=True, blank=True)
+    is_ocr_verified = models.BooleanField(default=False)
     
     def __str__(self):
         return f"{self.medicine.name} ({self.strength}) at {self.pharmacy.name}"

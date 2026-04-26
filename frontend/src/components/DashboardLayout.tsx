@@ -1,12 +1,11 @@
 'use client';
-import { useState, ReactNode } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  LayoutDashboard, Package, Clock, BarChart3, FileText,
-  User, Bell, ChevronLeft, ChevronRight, Activity,
-  Pill, LogOut, Settings,
+  Pill, LogOut, Settings, AlertTriangle, ExternalLink, 
+  LayoutDashboard, Package, Clock, BarChart3, FileText, User, Activity, ChevronRight, ChevronLeft, Bell
 } from 'lucide-react';
 import { logout } from '@/services/api';
 
@@ -14,7 +13,7 @@ const navItems = [
   { label: 'Overview',      href: '/pharmacist',             icon: LayoutDashboard },
   { label: 'Inventory',     href: '/pharmacist/inventory',   icon: Package },
   { label: 'Reservations',  href: '/pharmacist/reservations',icon: Clock },
-  { label: 'Analytics',     href: '/pharmacist/analytics',   icon: BarChart3 },
+  { label: 'Revenue',       href: '/pharmacist/revenue',      icon: BarChart3 },
   { label: 'Prescriptions', href: '/pharmacist/prescriptions',icon: FileText },
 ];
 
@@ -79,11 +78,28 @@ interface DashboardLayoutProps { children: ReactNode }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const sidebarW = collapsed ? 72 : 260;
+  const [showWarning, setShowWarning] = useState(false);
+  const [daysLeft, setDaysLeft] = useState(0);
+
+  useEffect(() => {
+    setMounted(true);
+    const needsWarning = localStorage.getItem('needs_subscription_warning') === 'true';
+    const days = parseInt(localStorage.getItem('days_until_expiry') || '0');
+    setShowWarning(needsWarning);
+    setDaysLeft(days);
+  }, []);
+
+  // Isolate pending page from the dashboard elements
+  if (pathname === '/pharmacist/pending') {
+    return <>{children}</>;
+  }
+
   const now = new Date();
-  const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-  const dateStr = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  const timeStr = mounted ? now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '';
+  const dateStr = mounted ? now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : '';
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--color-bg-base)' }}>
@@ -276,6 +292,54 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
         {/* Page content */}
         <main style={{ flex: 1, padding: '28px', overflowY: 'auto' }}>
+          <AnimatePresence>
+            {showWarning && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                style={{ 
+                  background: 'linear-gradient(135deg, #fffbeb, #fef3c7)',
+                  border: '1px solid #fde68a',
+                  borderRadius: '16px',
+                  padding: '16px 20px',
+                  marginBottom: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  boxShadow: '0 4px 12px rgba(251, 191, 36, 0.1)'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ 
+                    width: 40, height: 40, borderRadius: '12px', 
+                    background: '#fbbf24', display: 'flex', 
+                    alignItems: 'center', justifyContent: 'center', color: 'white'
+                  }}>
+                    <AlertTriangle size={20} />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#92400e', marginBottom: '2px' }}>
+                      Subscription Expiring Soon
+                    </h4>
+                    <p style={{ fontSize: '13px', color: '#b45309', fontWeight: 500 }}>
+                      Your {daysLeft === 0 ? 'trial' : 'subscription'} ends in <strong>{daysLeft} days</strong>. Please renew to avoid service interruption.
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => window.location.href = '/pharmacist/settings/subscription'}
+                  style={{ 
+                    padding: '8px 16px', borderRadius: '10px', background: '#92400e', 
+                    color: 'white', fontSize: '12px', fontWeight: 700, border: 'none', 
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px'
+                  }}
+                >
+                  Renew Now <ExternalLink size={14} />
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
           {children}
         </main>
       </div>

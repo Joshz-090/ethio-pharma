@@ -11,7 +11,7 @@ interface Medicine {
   id: string;
   name: string;
   generic_name: string;
-  category: string;
+  category: { id: string; name: string; icon?: string } | string;
   description?: string;
   manufacturer?: string;
 }
@@ -66,11 +66,14 @@ export default function AdminCatalogPage() {
     }
   };
 
-  const filtered = medicines.filter(m =>
-    m.name.toLowerCase().includes(search.toLowerCase()) ||
-    m.generic_name?.toLowerCase().includes(search.toLowerCase()) ||
-    m.category?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = medicines.filter(m => {
+    const categoryName = (m.category && typeof m.category === 'object') ? m.category.name : (m.category || '');
+    return (
+      (m.name || '').toLowerCase().includes(search.toLowerCase()) ||
+      (m.generic_name || '').toLowerCase().includes(search.toLowerCase()) ||
+      categoryName.toLowerCase().includes(search.toLowerCase())
+    );
+  });
 
   return (
     <div className="space-y-8 pb-12">
@@ -149,7 +152,7 @@ export default function AdminCatalogPage() {
                     </td>
                     <td className="px-8 py-5">
                       <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-slate-200">
-                        {m.category || 'Other'}
+                        {(m.category && typeof m.category === 'object') ? m.category.name : (m.category || 'Other')}
                       </span>
                     </td>
                     <td className="px-8 py-5 text-right">

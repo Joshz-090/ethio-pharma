@@ -18,7 +18,7 @@ export default function EditStockModal({ item, open, onClose, onSave }: EditStoc
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (item) { setQuantity(item.quantityOnHand); setPrice(item.unitPrice); }
+    if (item) { setQuantity(item.quantityOnHand || 0); setPrice(item.unitPrice || 0); }
   }, [item]);
 
   const handleSave = async () => {
