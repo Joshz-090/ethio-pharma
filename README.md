@@ -106,7 +106,7 @@ For the full API specification, see [docs/api_design.md](docs/api_design.md).
 - [docs/pitch_deck_outline.md](docs/pitch_deck_outline.md)
 - [docs/ai/README.md](docs/ai/README.md)
 
-## Local Run
+## Local Run 
 
 Backend:
 
