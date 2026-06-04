@@ -124,20 +124,7 @@ export default function LoginPage() {
               <p style={{ fontSize: '14px', color: '#6b7280', fontWeight: 500 }}>Access your pharmacy dashboard</p>
             </div>
 
-            <div style={{ background: '#f3f4f6', padding: '4px', borderRadius: '14px', display: 'flex', marginBottom: '24px', border: '1px solid #e5e7eb' }}>
-              <button
-                onClick={() => setTab('pharmacist')}
-                className={`login-tab-btn ${tab === 'pharmacist' ? 'login-tab-active' : 'login-tab-inactive'}`}
-              >
-                Pharmacist
-              </button>
-              <button
-                onClick={() => setTab('admin')}
-                className={`login-tab-btn ${tab === 'admin' ? 'login-tab-active' : 'login-tab-inactive'}`}
-              >
-                Admin
-              </button>
-            </div>
+
 
             <div className="login-card">
               
